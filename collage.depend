@@ -1,0 +1,96 @@
+# depslib dependency file v1.0
+1733417218 source:c:\users\pc\onedrive\bureau\projet pharmacy\collage\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<windows.h>
+	"menu login.h"
+	"menu_adm.h"
+	"interface.h"
+	"searcheByClient.h"
+	"repport.h"
+	"menu_client.h"
+
+1733409646 c:\users\pc\onedrive\bureau\projet pharmacy\collage\menu login.h
+	"interface.h"
+	"medical.h"
+	<stdlib.h>
+	<windows.h>
+	<stdio.h>
+	<conio.h>
+	<string.h>
+	<math.h>
+	<dos.h>
+	<time.h>
+	<ctype.h>
+	"employer.h"
+
+1733417155 c:\users\pc\onedrive\bureau\projet pharmacy\collage\menu_adm.h
+	<conio.h>
+	<string.h>
+	<math.h>
+	<direct.h>
+	<time.h>
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	"employer.h"
+	"medical.h"
+	"supplier.h"
+	"interface.h"
+	"repport.h"
+
+1733397881 c:\users\pc\onedrive\bureau\projet pharmacy\collage\employer.h
+	<conio.h>
+	<string.h>
+	<math.h>
+	<direct.h>
+	<time.h>
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	"interface.h"
+
+1733394999 c:\users\pc\onedrive\bureau\projet pharmacy\collage\medical.h
+	<conio.h>
+	<string.h>
+	<math.h>
+	<direct.h>
+	<time.h>
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	"interface.h"
+
+1733397939 c:\users\pc\onedrive\bureau\projet pharmacy\collage\supplier.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<windows.h>
+	"interface.h"
+
+1733417202 c:\users\pc\onedrive\bureau\projet pharmacy\collage\interface.h
+
+1733418910 c:\users\pc\onedrive\bureau\projet pharmacy\collage\repport.h
+	"employer.h"
+	"medical.h"
+	<conio.h>
+	<string.h>
+	<math.h>
+	<direct.h>
+	<time.h>
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+
+1733396669 c:\users\pc\onedrive\bureau\projet pharmacy\collage\searchebyclient.h
+
+1733411954 c:\users\pc\onedrive\bureau\projet pharmacy\collage\menu_client.h
+	"interface.h"
+
