@@ -11,7 +11,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+float calculateTotalProfit(med_list *head) {
+    float total_profit = 0.0;
+    med_list *current = head;
+    while (current != NULL) {
+        total_profit += current->data.profit;
+        current = current->next;
+    }
+    return total_profit;
+}
+medical findMostSoldMedication(med_list *head) {
+    med_list *current = head;
+    medical most_sold;
 
+    if (current == NULL) {
+        printf("No medications available.\n");
+        exit(1); // Exit the program or handle gracefully
+    }
+
+    most_sold = current->data;
+
+    while (current != NULL) {
+        if (current->data.quantity_sold > most_sold.quantity_sold) {
+            most_sold = current->data;
+        }
+        current = current->next;
+    }
+    return most_sold;
+}
+void listMedicationsNearExpiration(med_list *head, const char *expiry_date) {
+    gotoxy1(5, 5);
+    textcolor(10);
+    printf("Medications expiring before %s:\n", expiry_date);
+    textcolor(7);
+
+    int line = 7;
+    med_list *current = head;
+    int found = 0;
+
+    while (current != NULL) {
+        if (strcmp(current->data.exp_date, expiry_date) <= 0) {
+            gotoxy1(5, line++);
+            printf("ID: %s | Name: %s | Expiry Date: %s\n", 
+                   current->data.id, current->data.medi_name, 
+                   current->data.exp_date);
+            found = 1;
+        }
+        current = current->next;
+    }
+
+    if (!found) {
+        gotoxy1(5, line);
+        textcolor(12);
+        printf("No medications found near expiration.");
+        textcolor(7);
+    }
+}
+//----------------------------------------------------------------------------------------------------
 void sale_rpt_daily(med_list *head) {
     char date[15];
     system("cls"); // Clear the screen
@@ -137,17 +193,17 @@ void report_menu() {
             case 3:
                 system("cls");
                 box();
-                profit_rpt();
+                profit_rpt(head);
                 break;
             case 4:
                 system("cls");
                 box();
-                pur_rpt();
+                pur_rpt(head);
                 break;
             case 5:
                 system("cls");
                 box();
-                pur_rpt_daily();
+                pur_rpt_daily(head);
                 break;
             case 0:
                 printf("Returning to main menu...\n");
@@ -162,7 +218,7 @@ void profit_rpt(med_list *head) {
     float total_profit = 0;
 
     printf("\n--- RAPPORT DES PROFITS ---\n");
-    printf("Nom du médicament\tProfit\n");
+    printf("Nom du mï¿½dicament\tProfit\n");
     printf("----------------------------------\n");
 
     while (current != NULL) {
@@ -178,7 +234,7 @@ void profit_rpt(med_list *head) {
 void pur_rpt(med_list *head) {
     med_list *current = head;
     printf("\n--- RAPPORT DES ACHATS ---\n");
-    printf("Nom du médicament\tFournisseur\tPrix d'achat\n");
+    printf("Nom du mï¿½dicament\tFournisseur\tPrix d'achat\n");
     printf("-------------------------------------------------\n");
 
     while (current != NULL) {
@@ -194,7 +250,7 @@ void pur_rpt_daily(med_list *head) {
 
     med_list *current = head;
     printf("\n--- RAPPORT DES ACHATS POUR %s ---\n", jour);
-    printf("Nom du médicament\tFournisseur\tPrix d'achat\n");
+    printf("Nom du mï¿½dicament\tFournisseur\tPrix d'achat\n");
     printf("-------------------------------------------------\n");
 
     while (current != NULL) {

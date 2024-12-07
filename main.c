@@ -12,7 +12,7 @@
    int main(){
 //SetConsoleOutputCP(65001);
   //menuprincipale();
-//main_menu();
+  main_menu();
         return 0;
 
         }
