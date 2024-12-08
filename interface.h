@@ -1,6 +1,11 @@
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <conio.h>
+#include <windows.h>
 // Function to set cursor position
 void gotoxy1(int x, int y) {
     COORD coord;

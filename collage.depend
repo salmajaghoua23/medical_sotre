@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1733417218 source:c:\users\pc\onedrive\bureau\projet pharmacy\collage\main.c
+1733609309 source:c:\users\pc\onedrive\bureau\projet pharmacy\collage\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -26,7 +26,7 @@
 	<ctype.h>
 	"employer.h"
 
-1733417155 c:\users\pc\onedrive\bureau\projet pharmacy\collage\menu_adm.h
+1733611584 c:\users\pc\onedrive\bureau\projet pharmacy\collage\menu_adm.h
 	<conio.h>
 	<string.h>
 	<math.h>
@@ -42,7 +42,7 @@
 	"interface.h"
 	"repport.h"
 
-1733397881 c:\users\pc\onedrive\bureau\projet pharmacy\collage\employer.h
+1733610438 c:\users\pc\onedrive\bureau\projet pharmacy\collage\employer.h
 	<conio.h>
 	<string.h>
 	<math.h>
@@ -76,18 +76,13 @@
 
 1733417202 c:\users\pc\onedrive\bureau\projet pharmacy\collage\interface.h
 
-1733418910 c:\users\pc\onedrive\bureau\projet pharmacy\collage\repport.h
+1733611767 c:\users\pc\onedrive\bureau\projet pharmacy\collage\repport.h
 	"employer.h"
 	"medical.h"
-	<conio.h>
-	<string.h>
-	<math.h>
-	<direct.h>
-	<time.h>
-	<ctype.h>
 	<stdio.h>
 	<stdlib.h>
 	<windows.h>
+	<string.h>
 
 1733396669 c:\users\pc\onedrive\bureau\projet pharmacy\collage\searchebyclient.h
 

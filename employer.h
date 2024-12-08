@@ -26,8 +26,6 @@ typedef struct str {
     Employe data;
     struct str *suivant;
 } *liste;
-
-
 void draw_box(int x, int y, int width, int height) {
     gotoxy(x, y);
     printf("%c", 201);
@@ -46,7 +44,6 @@ void draw_box(int x, int y, int width, int height) {
     for (int i = 0; i < width - 2; i++) printf("%c", 205);
     printf("%c", 188);
 }
-
 // === Main Functions ===
 void insererfin(liste *l, Employe e1) {
     FILE *p = fopen("employer.txt", "a+");
@@ -82,7 +79,7 @@ void insererfin(liste *l, Employe e1) {
     textcolor(7); // Default color
 }
 void afficher_tous_les_employes(liste l) {
-    const int LINES_PER_PAGE = 10; // Nombre de lignes à afficher par page
+    const int LINES_PER_PAGE = 10; // Nombre de lignes ï¿½ afficher par page
     system("cls");
 
     FILE *p = fopen("employer.txt", "r");
@@ -101,7 +98,7 @@ void afficher_tous_les_employes(liste l) {
     char nom[50], role[50], contact[100];
     float salaire;
 
-    int totalEmployees = 0;   // Compteur pour les employés
+    int totalEmployees = 0;   // Compteur pour les employï¿½s
     int page = 1;             // Page actuelle
     char choice;              // Choix de l'utilisateur pour naviguer
 
@@ -109,7 +106,7 @@ void afficher_tous_les_employes(liste l) {
         system("cls");
         draw_box(5, 2, 70, 20);
 
-        // Afficher l'en-tête
+        // Afficher l'en-tï¿½te
         textcolor(11); // Cyan for title
         gotoxy(10, 3);
         printf("=== List of All Employees (Page %d) ===", page);
@@ -123,7 +120,7 @@ void afficher_tous_les_employes(liste l) {
 
         // Afficher les lignes de la page
         int line = 8;
-        int displayed = 0; // Nombre de lignes affichées sur la page
+        int displayed = 0; // Nombre de lignes affichï¿½es sur la page
 
         // Avancer le curseur dans le fichier selon la page
         rewind(p);
@@ -133,7 +130,7 @@ void afficher_tous_les_employes(liste l) {
             }
         }
 
-        // Lire les employés pour cette page
+        // Lire les employï¿½s pour cette page
         while (fscanf(p, "%d\t%[^\n]\t%[^\n]\t%[^\n]\t%f\n", &employeID, nom, role, contact, &salaire) == 5) {
             gotoxy(8, line++);
             printf("| %-4d | %-20s | %-12s | %-12.2f |", employeID, nom, role, salaire);
@@ -145,7 +142,7 @@ void afficher_tous_les_employes(liste l) {
             }
         }
 
-        // Afficher une ligne de séparation en bas
+        // Afficher une ligne de sï¿½paration en bas
         gotoxy(8, line);
         printf("+-----------------------------------------------------------+");
 
@@ -225,7 +222,7 @@ void menu_employer(liste *l) {
         draw_box(5, 2, 70, 20);
         textcolor(14); // Yellow for title
         gotoxy(30, 3);
-        printf("EMPLOYEE MANAGEMENT MENU");
+        printf("---EMPLOYEE MANAGEMENT MENU---");
         textcolor(7); // Default color
 
         gotoxy(10, 6);

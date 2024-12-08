@@ -93,16 +93,9 @@ gotoxy(15, 40);
 
 			default:
 			gotoxy(11,34);
-			printf("Plaise Enter a number -----^~^");
+			printf("Plaise Enter a number -----");
 			getch();
 		}
 	}while(ch!='E');
 }
-
-
-
-
-
-
-
 #endif // MENU_ADM_H_INCLUDED

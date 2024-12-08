@@ -170,11 +170,11 @@ void supplier_menu() {
     do {
         system("cls");
         gotoxy3(34, 3);
-        printf("--------------");
+        printf("---------------------");
         gotoxy3(35, 4);
-        printf("Supplier MENU");
+        printf("----Supplier MENU----");
         gotoxy3(34, 5);
-        printf("--------------");
+        printf("---------------------");
 
         box(); // Draw the box
         gotoxy3(26, 8);

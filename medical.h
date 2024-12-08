@@ -22,7 +22,7 @@ struct medical {
     float cost;
     float profit;
     float purchase_price;
-    float sale_price;  // Nouveau champ ajouté pour le prix de vente
+    float sale_price;  
     char exp_date[15];
     char supplier_name[30];
 };
