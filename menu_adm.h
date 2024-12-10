@@ -3,23 +3,24 @@
 #include <conio.h>
 #include <string.h>
 #include <math.h>
-#include <direct.h>
 #include <time.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
-#include "employer.h"
+#include"employer.h"
 #include"medical.h"
 #include"supplier.h"
 #include"interface.h"
+#include"Notification.h"
 #include"repport.h"
+void  main_menu();
 void  main_menu(){
 char ch;
 liste l;
-
-do{
-    system("cls");
+liste employes = NULL;
+do{system("cls");
+ if(verifierStockMax) verifierStockMax();
 box2();
 gotoxy(20, 5);
 textcolor(2);
@@ -36,23 +37,29 @@ textcolor(2);
  textcolor(14);
  printf("\n\n");
  textcolor(14);
- printf("\t\t 1-SUPPLIER\n\n\t\t 2-EMPLOYER\n\n\t\t 3-MEDICAL\n\n\t\t 4-REPPORT_MENU\n\n\t\t 5-ABOUT\n\n\t\n");
- textcolor(15); gotoxy(15, 12);
+ printf("\t\t 1-SUPPLIER\n\n\t\t 2-EMPLOYER\n\n\t\t 3-MEDICAL\n\n\t\t 4-REPPORT_MENU\n\n\t\t 5-ABOUT\n\n\t\t 6-Exit \n\n\t");
+ textcolor(14); gotoxy(15, 12);
  printf("\n\n");
-//remainder();
 gotoxy(15,40);
-printf("\n\n\n\n\n\n\n\n\n\n\n\nPRESS THE NUMBER OF THE OPTION THAT WHAT YOU WANT .........?\n\n");
+textcolor(6);
+printf("\t\n\n\n\n\n\n\n\n\n\n\nPRESS THE NUMBER OF THE OPTION THAT WHAT YOU WANT .........?\t");
 gotoxy(15, 40);
 		ch=toupper(getche());
 		switch(ch)
 		{
 			case '1':supplier_menu();
+			 Sleep(1000);
 				 break;
-			case '2':menu_employer(l);
+
+			case '2':
+              menu_employer(&employes);
+			   Sleep(1000);
 				 break;
 			case '3':medication_menu();
+			 Sleep(1000);
 				 break;
 			case '4':report_menu();
+			 Sleep(1000);
 				 break;
 			case '5':
                 box2();
@@ -73,6 +80,7 @@ gotoxy(15, 40);
                 gotoxy(8,18);
 	            printf("=> is located in HOCIEMA ");
 				break;
+			case '6' :
 			printf("\n\n\n\n\t Do you want to exit now? Y/N :");
 			Sleep(100);
 			ch=(getche());
@@ -90,12 +98,12 @@ gotoxy(15, 40);
 			{
 				main_menu();
 			}
-
+             break;
 			default:
 			gotoxy(11,34);
 			printf("Plaise Enter a number -----");
 			getch();
 		}
-	}while(ch!='E');
+	}while(ch!='6');
 }
 #endif // MENU_ADM_H_INCLUDED

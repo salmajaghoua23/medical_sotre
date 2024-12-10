@@ -108,23 +108,32 @@ void delete_supplier(list1 *l, int supp_id) {
     fclose(p);
 }
 
-// Function to display all suppliers
+// Fonction pour afficher les fournisseurs
 void display_suppliers(list1 l) {
-    if (l == NULL) {
-        printf("The supplier list is empty!\n");
-        return;
-    }
+    int x = 5, y = 3;  // Position de départ du texte à l'intérieur de la boîte
 
-    printf("List of Suppliers:\n");
-    printf("ID\tName\tCity\tPhone\tEmail\n");
-    printf("-----------------------------------------------------\n");
+    // Appel de la fonction box pour dessiner l'encadré
+    box();
+
+    // Affichage du titre et de l'en-tête à l'intérieur du cadre
+    gotoxy(x, y);
+    printf("List of Suppliers");
+    gotoxy(x, y + 1);
+    printf("ID\tName\tCity\tPhone\tEmail");
+    
+    // Déplacer la ligne d'affichage des fournisseurs
+    y = 5;  // Nouvelle position après l'en-tête
+
+    // Parcours de la liste des fournisseurs et affichage des données
     while (l != NULL) {
-        printf("%d\t%s\t%s\t%s\t%s\n",
-               l->data.supp_id,
-               l->data.supp_name,
-               l->data.city,
-               l->data.mob_no,
+        gotoxy(x, y);
+        printf("%d\t%s\t%s\t%s\t%s", 
+               l->data.supp_id, 
+               l->data.supp_name, 
+               l->data.city, 
+               l->data.mob_no, 
                l->data.email);
+        y++;
         l = l->next;
     }
 }
@@ -170,12 +179,11 @@ void supplier_menu() {
     do {
         system("cls");
         gotoxy3(34, 3);
-        printf("---------------------");
+        textcolor(2);
         gotoxy3(35, 4);
         printf("----Supplier MENU----");
         gotoxy3(34, 5);
-        printf("---------------------");
-
+        textcolor(14);
         box(); // Draw the box
         gotoxy3(26, 8);
         printf("1- Add New Supplier");
@@ -187,7 +195,7 @@ void supplier_menu() {
         printf("4- Quit");
 
         gotoxy3(26, 18);
-        printf("Press a key for operation...");
+        printf("\n\n\t Press a key for operation...\t");
 
         ch = toupper(getche()); // Get user input
 

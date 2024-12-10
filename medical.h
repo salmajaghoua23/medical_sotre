@@ -4,16 +4,14 @@
 #include <conio.h>
 #include <string.h>
 #include <math.h>
-#include <direct.h>
 #include <time.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
 #include"interface.h"
-
 // Medical structure
-struct medical {
+typedef struct {
     char id[6];
     char medi_name[20];
     int quantity;
@@ -22,19 +20,17 @@ struct medical {
     float cost;
     float profit;
     float purchase_price;
-    float sale_price;  
+    float sale_price;
     char exp_date[15];
     char supplier_name[30];
-};
-
-typedef struct medical medical;
+} medical;
 
 // Linked list structure
 typedef struct node {
     medical data;
     struct node *next;
 } med_list;
-
+ medical med;
 // Insert a new medicine
 void insert_med(med_list **list, medical med) {
     FILE *file = fopen("medicines.txt", "a+");
@@ -78,18 +74,18 @@ void insert_med(med_list **list, medical med) {
 // Display medicines with pagination
 void display_meds(med_list **list) {
     system("cls");
-    box2(); // Draw the box
+    box2(); // Dessine la boîte
 
     FILE *file = fopen("medicines.txt", "r");
     if (file == NULL) {
-        gotoxy1(4, 3); // Position inside the box
-        setTextColor(4); // Red for warning
-        printf("Failed to open the medicines file.\n");
-        setTextColor(7); // Reset to white
+        gotoxy1(4, 3); // Position dans la boîte
+        setTextColor(4); // Rouge pour les avertissements
+        printf("Erreur : Impossible d'ouvrir le fichier des médicaments.\n");
+        setTextColor(7); // Blanc par défaut
         return;
     }
 
-    // Load data from file into the list if necessary
+    // Charger les données dans la liste si elle est vide
     if (*list == NULL) {
         medical med;
         while (fscanf(file, "%s %s %d %d %d %f %f %f %s %s",
@@ -101,52 +97,60 @@ void display_meds(med_list **list) {
 
     fclose(file);
 
-    // Check if the list is still empty after loading the file
+    // Vérifier si la liste est vide
     if (*list == NULL) {
-        gotoxy1(4, 3); // Position inside the box
-        setTextColor(4); // Red for warning
-        printf("The list is empty.\n");
-        setTextColor(7); // Reset to white
+        gotoxy1(4, 3); // Position dans la boîte
+        setTextColor(4); // Rouge pour les avertissements
+        printf("La liste est vide.\n");
+        setTextColor(7); // Blanc par défaut
         return;
     }
 
-    // Table header
-    gotoxy1(4, 3); // Position inside the box
-    setTextColor(2); // Green for headers
-    printf("%-10s %-20s %-10s %-20s %-15s %-15s %-15s %-15s %-15s %-20s",
-           "ID", "Name", "Quantity", "Prescription ID", "Sold Qty", "Cost", "Profit", "Purchase", "Exp. Date", "Supplier");
+    // Affichage des titres de la table
+    gotoxy1(4, 3); // Début des titres dans la boîte
+    setTextColor(2); // Vert pour les titres
+    printf(" ID    | Name         | Qty | PrescID | Sold | Cost   | Profit | Exp. Date   ");
     gotoxy1(4, 4);
-    printf("----------------------------------------------------------------------------------------------------------");
-    setTextColor(7); // Reset to white
+    printf("--------------------------------------------------------------------");
+    setTextColor(7); // Blanc par défaut
 
-    // Display medicines with pagination
+    // Affichage des données avec pagination
     med_list *current = *list;
-    int row = 5;
+    int row = 5;  // Première ligne après les titres
     int page = 1;
 
     while (current != NULL) {
         gotoxy1(4, row);
-        printf("%-10s %-20s %-10d %-20d %-15d %-15.2f %-15.2f %-15.2f %-15s %-20s",
-               current->data.id, current->data.medi_name, current->data.quantity, current->data.id_prescription,
-               current->data.quantity_sold, current->data.cost, current->data.profit, current->data.purchase_price,
-               current->data.exp_date, current->data.supplier_name);
+        printf(" %-5s | %-12s | %-3d | %-7d | %-4d | %-6.2f | %-6.2f | %-11s ",
+               current->data.id, current->data.medi_name, current->data.quantity,
+               current->data.id_prescription, current->data.quantity_sold,
+               current->data.cost, current->data.profit, current->data.exp_date);
 
         current = current->next;
         row++;
 
-        if (row == 24) {
+        // Si la ligne dépasse les limites de la boîte, passer à la page suivante
+        if (row == 22) { // Limite pour 18 lignes de données dans une boîte
             gotoxy1(4, row);
-            printf("Press any key for next page...");
+            printf("Appuyez sur une touche pour continuer...");
             getch();
             system("cls");
             box2();
-            row = 5;
+
+            // Réinitialiser les titres pour la nouvelle page
+            gotoxy1(4, 3);
+            setTextColor(2); // Vert pour les titres
+            printf(" ID    | Name         | Qty | PrescID | Sold | Cost   | Profit | Exp. Date   ");
+            gotoxy1(4, 4);
+            printf("---------------------------------------------------------------------");
+            setTextColor(7); // Blanc par défaut
+            row = 5; // Recommencer en bas
             page++;
         }
     }
 
     gotoxy1(4, row);
-    printf("End of list. Total pages: %d\n", page);
+    printf("\n\n\n\n\n\n\n\n\tFin de la liste. Total pages : %d\n", page);
 }
 
 // Delete a medicine by ID
@@ -233,7 +237,7 @@ void medication_menu() {
         gotoxy1(20, 14);
         printf("3. Delete Medicine");
         gotoxy1(20, 16);
-        printf("4. Exit");
+        printf("4. Exit ");
         gotoxy1(20, 18);
 
         printf("Enter choice: ");
@@ -244,35 +248,36 @@ void medication_menu() {
                 medical med;
                 system("cls");
                 box2();
-                gotoxy1(4, 5);
-                printf("Enter Medicine ID: ");
+                textcolor(14);
+                gotoxy1(15, 5);
+                printf("--Enter Medicine ID: ");
                 scanf("%5s", med.id);
-                gotoxy1(4, 6);
-                printf("Enter Medicine Name: ");
+                gotoxy1(15, 6);
+                printf("--Enter Medicine Name: ");
                 scanf("%19s", med.medi_name);
-                gotoxy1(4, 7);
-                printf("Enter Quantity: ");
+                gotoxy1(15, 7);
+                printf("--Enter Quantity: ");
                 scanf("%d", &med.quantity);
-                gotoxy1(4, 8);
-                printf("Enter Prescription ID: ");
+                gotoxy1(15, 8);
+                printf("--Enter Prescription ID: ");
                 scanf("%d", &med.id_prescription);
-                gotoxy1(4, 9);
-                printf("Enter Quantity Sold: ");
+                gotoxy1(15, 9);
+                printf("--Enter Quantity Sold: ");
                 scanf("%d", &med.quantity_sold);
-                gotoxy1(4, 10);
-                printf("Enter Cost: ");
+                gotoxy1(15, 10);
+                printf("--Enter Cost: ");
                 scanf("%f", &med.cost);
-                gotoxy1(4, 11);
-                printf("Enter Profit: ");
+                gotoxy1(15, 11);
+                printf("--Enter Profit: ");
                 scanf("%f", &med.profit);
-                gotoxy1(4, 12);
-                printf("Enter Purchase Price: ");
+                gotoxy1(15, 12);
+                printf("--Enter Purchase Price: ");
                 scanf("%f", &med.purchase_price);
-                gotoxy1(4, 13);
-                printf("Enter Expiry Date (dd/mm/yyyy): ");
+                gotoxy1(15, 13);
+                printf("--Enter Expiry Date (dd/mm/yyyy): ");
                 scanf("%14s", med.exp_date);
-                gotoxy1(4, 14);
-                printf("Enter Supplier Name: ");
+                gotoxy1(15, 14);
+                printf("--Enter Supplier Name: ");
                 scanf("%29s", med.supplier_name);
 
                 insert_med(&list, med);
@@ -284,12 +289,17 @@ void medication_menu() {
             case '3':
                 system("cls");
                 box2();
+                textcolor(2);
                 gotoxy1(4, 5);
-                printf("Enter Medicine ID to delete: ");
+                printf("----Enter Medicine ID to delete---- ");
                 scanf("%s", id);
+                textcolor(15);
                 delete_med(&list, id);
                 break;
             case '4':
+                box();
+                gotoxy(20,10);
+                textcolor(4);
                 printf("Exit !!");
                 break;
             default:

@@ -1,11 +1,14 @@
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
-#include <windows.h>
+#include<stdlib.h>
+#include<windows.h>
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<math.h>
+#include<time.h>
+#include<unistd.h>
+#include<ctype.h>
 // Function to set cursor position
 void gotoxy1(int x, int y) {
     COORD coord;
@@ -32,6 +35,7 @@ void setTextColor(int color) {
 
 // Box for display
 void box() {
+
     gotoxy1(2, 2);
     printf("%c", 201);
     gotoxy1(78, 2);
@@ -77,6 +81,31 @@ void box2() {
     }
 }
 
+void welcome()
+{
+ system("cls");
+
+	  box();
+
+        gotoxy(35,20);
+		printf("WELCOME");
+
+		gotoxy(38,22);
+		printf("TO");
+
+		gotoxy(28,24);
+		printf("MEDICAL");
+		gotoxy(36,24);
+		printf("STORE");
+
+		gotoxy(42,24);
+		printf("SYSTEM");
+		gotoxy(52,45);
+
+		printf("Loading......");
+		Sleep(40);
 
 
-#endif // INTERFACE_H_INCLUDED
+}
+
+#endif

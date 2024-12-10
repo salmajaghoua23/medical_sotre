@@ -2,17 +2,24 @@
 #define MEDICAMENT_H_INCLUDED
 #include"interface.h"
 #include"medical.h"
+#include"menu_adm.h"
+#include"employer.h"
+#include"panier.h"
+#include"commande.h"
+#include <unistd.h>
+#include<ctype.h>
 #include<stdlib.h>
 #include <windows.h>
 #include<stdio.h>
 #include<conio.h>
 #include<string.h>
 #include<math.h>
-#include<dos.h>
+#include<direct.h>
 #include<time.h>
 #include<ctype.h>
-#include"employer.h"
-
+#include"menu_client.h"
+medical med;
+void displayMedicines1();
 struct customer{
 	int cust_id;
 	char cust_name[30];
@@ -52,12 +59,13 @@ struct Ordonnance {
     char validity_period[15];
 };
 
+
 int verifyLoginAdmin() {
-    FILE *file = fopen("admins.txt", "r");
+    FILE *file = fopen("admins1.txt", "r");
     if (!file) {
-        textcolor(4); // Rouge
-        printf("Erreur lors de l'ouverture du fichier administrateurs.\n");
-        textcolor(7); // Réinitialisation
+        textcolor(4);
+        printf("Error opening the administrator file.\n");
+        textcolor(7);
         return 0;
     }
 
@@ -66,10 +74,10 @@ int verifyLoginAdmin() {
     int attempts = 0, found = 0;
 
     while (attempts < 3) {
-        system("cls"); // Effacer l'écran
+        system("cls");
 
-        // Design principal
-        textcolor(2); // Vert
+
+        textcolor(14);
         int i;
         for (i = 3; i < 28; i++) {
             gotoxy(25, i);
@@ -93,307 +101,351 @@ int verifyLoginAdmin() {
         printf("╝");
 
         textcolor(2);
-        gotoxy(45, 2);
-        printf("╔════════════════════════════════════╗");
-        gotoxy(45, 3);
-        printf("║      SYSTEME DE GESTION D'ADMIN    ║");
-        gotoxy(45, 4);
-        printf("╚════════════════════════════════════╝");
+        gotoxy(40, 5);
+        printf("=============================================");
+        textcolor(10);
+        gotoxy(40, 6);
+        printf("        WELCOME TO THE LOGIN SYSTEM          ");
+        textcolor(2);
+        gotoxy(40, 7);
+        printf("=============================================");
 
-        // Formulaire de saisie
         textcolor(14);
         gotoxy(40, 10);
         printf("╔══════════════════════════════════════╗");
         gotoxy(40, 11);
-        printf("║ Nom d'utilisateur :                  ║");
+        printf("║ Username:                            ║");
         gotoxy(40, 12);
         printf("╚══════════════════════════════════════╝");
 
         gotoxy(40, 14);
         printf("╔══════════════════════════════════════╗");
         gotoxy(40, 15);
-        printf("║ Mot de passe :                       ║");
+        printf("║ Password:                            ║");
         gotoxy(40, 16);
         printf("╚══════════════════════════════════════╝");
 
-        textcolor(7); // Blanc
-        gotoxy(65, 11);
+
+        textcolor(7);
+        gotoxy(52, 11);
         scanf("%24s", enteredName);
 
-        gotoxy(65, 15);
-        scanf("%14s", enteredPassword);
 
-        // Vérification dans le fichier
-        rewind(file); // Revenir au début du fichier
+        gotoxy(52, 15);
+        int index = 0;
+        char ch;
+        while ((ch = getch()) != '\r') {
+            if (ch == '\b') {
+                if (index > 0) {
+                    index--;
+                    printf("\b \b");
+                }
+            } else if (index < 14) {
+                enteredPassword[index++] = ch;
+                printf("*");
+            }
+        }
+        enteredPassword[index] = '\0';
+
+
+        rewind(file);
         while (fscanf(file, "%d %24s %14s", &adminTemp.admin_id, adminTemp.admin_name, adminTemp.password) == 3) {
-            printf( "%d %24s %14s", adminTemp.admin_id, adminTemp.admin_name, adminTemp.password);
-
             if (strcmp(adminTemp.admin_name, enteredName) == 0 &&
                 strcmp(adminTemp.password, enteredPassword) == 0) {
                 found = 1;
-               break;
+                break;
             }
         }
 
         if (found) {
-            // Login réussi
-            textcolor(10); // Vert
+
+            textcolor(10);
             gotoxy(40, 20);
             printf("╔══════════════════════════════════════════════════════╗");
             gotoxy(40, 21);
-            printf("║  Login réussi : L'administrateur est authentifié.    ║");
+            printf("║  Login successful: Administrator authenticated!      ║");
             gotoxy(40, 22);
             printf("╚══════════════════════════════════════════════════════╝");
-            textcolor(7); // Réinitialisation
+            textcolor(7);
             fclose(file);
             return 1;
         } else {
-            // Login échoué
-            textcolor(4); // Rouge
+
+            textcolor(4);
             gotoxy(40, 20);
             printf("╔══════════════════════════════════════════════════════╗");
             gotoxy(40, 21);
-            printf("║  Login échoué : Vérifiez vos identifiants.           ║");
+            printf("║  Login failed: Please check your credentials.        ║");
             gotoxy(40, 22);
             printf("╚══════════════════════════════════════════════════════╝");
-            textcolor(7); // Réinitialisation
+            textcolor(7);
             attempts++;
             gotoxy(40, 24);
-            printf("Il vous reste %d essais.", 3 - attempts);
-            getch(); // Attendre une touche pour continuer
+            printf("You have %d attempt(s) left.", 3 - attempts);
+            getch();
         }
     }
 
     fclose(file);
 
-    // Échec après 3 essais
-    textcolor(4); // Rouge
+
+    textcolor(4);
     system("cls");
     gotoxy(40, 20);
     printf("╔══════════════════════════════════════════════════════╗");
     gotoxy(40, 21);
-    printf("║  Accès refusé : Nombre d'essais dépassé.             ║");
+    printf("║  Access denied: Maximum attempts exceeded.           ║");
     gotoxy(40, 22);
     printf("╚══════════════════════════════════════════════════════╝");
-    textcolor(7); // Réinitialisation
+    textcolor(7);
     return 0;
 }
+
+
 void menuEmploye() {
-    int i;
+    int choice;
+
+    do {
+        system("cls");
 
 
-    textcolor(2);
-    for (i = 3; i < 28; i++) {
-        gotoxy(25, i);
-        printf("║");
-        gotoxy(110, i);
-        printf("║");
-    }
-
-    for (i = 26; i < 111; i++) {
-        gotoxy(i, 28);
-        printf("═");
-    }
-
-    for (i = 26; i < 52; i++) {
-        gotoxy(i, 3);
-        printf("═");
-    }
-
-    for (i = 80; i < 110; i++) {
-        gotoxy(i, 3);
-        printf("═");
-    }
-
-    gotoxy(25, 3);
-    printf("╔");
-    gotoxy(110, 3);
-    printf("╗");
-    gotoxy(25, 28);
-    printf("╚");
-    gotoxy(110, 28);
-    printf("╝");
-
-    textcolor(10);
-    gotoxy(53, 2);
-    printf("╔══════════════════════════════╗");
-    gotoxy(53, 3);
-    printf("║       PHARMACY SYSTEM        ║");
-    gotoxy(53, 4);
-    printf("╚══════════════════════════════╝");
+        textcolor(14);
+        int i;
+        for (i = 3; i < 28; i++) {
+            gotoxy(25, i);
+            printf("║");
+            gotoxy(110, i);
+            printf("║");
+        }
+        for (i = 25; i < 111; i++) {
+            gotoxy(i, 3);
+            printf("═");
+            gotoxy(i, 28);
+            printf("═");
+        }
+        gotoxy(25, 3);
+        printf("╔");
+        gotoxy(110, 3);
+        printf("╗");
+        gotoxy(25, 28);
+        printf("╚");
+        gotoxy(110, 28);
+        printf("╝");
 
 
-    textcolor(14);
-    for (i = 11; i < 25; i++) {
-        gotoxy(45, i);
-        printf("║");
-        gotoxy(90, i);
-        printf("║");
-    }
+        textcolor(2);
+        gotoxy(40, 5);
+        printf("=============================================");
+        textcolor(10);
+        gotoxy(40, 6);
+        printf("          PHARMACY SYSTEM EMPLOYEE MENU      ");
+        textcolor(2);
+        gotoxy(40, 7);
+        printf("=============================================");
 
-    for (i = 46; i < 90; i++) {
-        gotoxy(i, 25);
-        printf("═");
-    }
-    gotoxy(45, 25);
-    printf("╚");
-    gotoxy(90, 25);
-    printf("╝");
-
-    for (i = 46; i < 90; i++) {
-        gotoxy(i, 10);
-        printf("═");
-    }
-    gotoxy(45, 10);
-    printf("╔");
-    gotoxy(90, 10);
-    printf("╗");
+        // Menu options
+        textcolor(15); // White
+        gotoxy(30, 10);
+        printf("1. View Medicine Information");
+        gotoxy(30, 12);
+        printf("2. Place an Order");
+        gotoxy(30, 14);
+        printf("3. Cancel an Order");
+        gotoxy(30, 16);
+        printf("4. Exit");
 
 
-    textcolor(14);
-    gotoxy(58, 9);
-    printf("╔════════════════╗");
-    gotoxy(58, 10);
-    printf("║      MENU      ║");
-    gotoxy(58, 11);
-    printf("╚════════════════╝");
+        textcolor(7);
+        gotoxy(30, 19);
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
 
-    textcolor(15);
-    gotoxy(58, 14);
-    printf("1. about  medecine ");
+        switch (choice) {
+            case 1:
+               displayMedicines1();
+                break;
 
-    gotoxy(58, 16);
-    printf("2. pass order      ");
+            case 2:
+               // place_order();
+                break;
 
-    gotoxy(58, 18);
-    printf("3. Cancel order    ");
+            case 3:
+              // removeFromCart() ;
+                break;
 
-    gotoxy(58, 20);
-    printf("4.exit             ");
+            case 4:
+                textcolor(10);
+                gotoxy(30, 22);
+                printf("Exiting Employee Menu. Goodbye!");
+                textcolor(7);
+                break;
 
-
-    textcolor(7);
-    gotoxy(65, 22);
-    printf("╔═══╗");
-    gotoxy(65, 23);
-    printf("║   ║");
-    gotoxy(65, 24);
-    printf("╚═══╝");
-
-
-    textcolor(7);
+            default:
+                textcolor(4);
+                gotoxy(30, 22);
+                printf("Invalid choice! Please try again.");
+                textcolor(7);
+                getch();
+                break;
+        }
+    } while (choice != 4);
 }
 
-int verifierLoginEmploye() {
-    FILE *file = fopen("employerr.txt", "r");
+
+
+int verifyLoginEmployee() {
+    FILE *file = fopen("employer.txt", "r");
     if (!file) {
-        textcolor(4); // Rouge
-        printf("Erreur lors de l'ouverture du fichier employés.\n");
-        textcolor(7);
+        textcolor(4); // Red for error
+        printf("Error opening the employee file.\n");
+        textcolor(7); // Reset color
         return 0;
     }
 
-    char nomEntree[50], contactEntree[100];
-    Employe employeTemp;
+    char enteredName[50], enteredContact[100];
+    Employe employeeTemp;
     int found = 0;
 
-    textcolor(2);
-    int i;
-    for (i = 3; i < 28; i++) {
-        gotoxy(25, i);
-        printf("║");
-        gotoxy(110, i);
-        printf("║");
-    }
-    for (i = 25; i < 111; i++) {
-        gotoxy(i, 3);
-        printf("═");
-        gotoxy(i, 28);
-        printf("═");
-    }
-    gotoxy(25, 3);
-    printf("╔");
-    gotoxy(110, 3);
-    printf("╗");
-    gotoxy(25, 28);
-    printf("╚");
-    gotoxy(110, 28);
-    printf("╝");
-
-    textcolor(2);
-    gotoxy(45, 2);
-    printf("╔════════════════════════════════════╗");
-    gotoxy(45, 3);
-    printf("║     SYSTEME DE GESTION D'EMPLOYES  ║");
-    gotoxy(45, 4);
-    printf("╚════════════════════════════════════╝");
+    int attempts = 0;
+    while (attempts < 3) {
+        system("cls");
 
 
-    textcolor(14);
-    gotoxy(40, 10);
-    printf("╔══════════════════════════════════════╗");
-    gotoxy(40, 11);
-    printf("║ Nom de l'employé:                    ║");
-    gotoxy(40, 12);
-    printf("╚══════════════════════════════════════╝");
+        textcolor(14);
+        int i;
+        for (i = 3; i < 28; i++) {
+            gotoxy(25, i);
+            printf("║");
+            gotoxy(110, i);
+            printf("║");
+        }
+        for (i = 25; i < 111; i++) {
+            gotoxy(i, 3);
+            printf("═");
+            gotoxy(i, 28);
+            printf("═");
+        }
+        gotoxy(25, 3);
+        printf("╔");
+        gotoxy(110, 3);
+        printf("╗");
+        gotoxy(25, 28);
+        printf("╚");
+        gotoxy(110, 28);
+        printf("╝");
 
-    gotoxy(40, 14);
-    printf("╔══════════════════════════════════════╗");
-    gotoxy(40, 15);
-    printf("║ Contact de l'employé:                ║");
-    gotoxy(40, 16);
-    printf("╚══════════════════════════════════════╝");
+
+        textcolor(2);
+        gotoxy(40, 5);
+        printf("=============================================");
+        textcolor(10);
+        gotoxy(40, 6);
+        printf("          EMPLOYER LOGIN SYSTEM              ");
+        textcolor(2);
+        gotoxy(40, 7);
+        printf("=============================================");
 
 
-    textcolor(7);
-    gotoxy(65, 11);
-    scanf("%49s", nomEntree);
+        textcolor(14);
+        gotoxy(40, 11);
+        printf("╔══════════════════════════════════════╗");
+        gotoxy(40, 12);
+        printf("║ Employer Name:                       ║");
+        gotoxy(40, 13);
+        printf("╚══════════════════════════════════════╝");
 
-    gotoxy(65, 15);
-    scanf("%99s", contactEntree);
+        gotoxy(40, 15);
+        printf("╔══════════════════════════════════════╗");
+        gotoxy(40, 16);
+        printf("║ Contact (Password):                  ║");
+        gotoxy(40, 17);
+        printf("╚══════════════════════════════════════╝");
 
-    // Lecture des données dans le fichier et vérification
-    while (fscanf(file, "%d %49s %49s %99s %f",
-                  &employeTemp.employeID,
-                  employeTemp.nom,
-                  employeTemp.role,
-                  employeTemp.contact,
-                  &employeTemp.salaire) == 5) {
-        if (strcmp(employeTemp.nom, nomEntree) == 0 && strcmp(employeTemp.contact, contactEntree) == 0) {
-            found = 1; // Correspondance trouvée
-            break;
+        textcolor(7);
+        gotoxy(60, 12);
+        scanf("%49s", enteredName);
+
+
+        gotoxy(61, 16);
+        int index = 0;
+        char ch;
+        while (1) {
+            ch = getch();
+            if (ch == 13) {
+                enteredContact[index] = '\0';
+                break;
+            } else if (ch == 8) {
+                if (index > 0) {
+                    index--;
+                    printf("\b \b");
+                }
+            } else if (index < 99) {
+                enteredContact[index++] = ch;
+                printf("*");
+            }
+        }
+
+
+        rewind(file);
+        while (fscanf(file, "%d %49s %49s %99s %f",
+                      &employeeTemp.employeID,
+                      employeeTemp.nom,
+                      employeeTemp.role,
+                      employeeTemp.contact,
+                      &employeeTemp.salaire) == 5) {
+            if (strcmp(employeeTemp.nom, enteredName) == 0 && strcmp(employeeTemp.contact, enteredContact) == 0) {
+                found = 1;
+                break;
+            }
+        }
+
+        if (found) {
+
+            textcolor(10);
+            gotoxy(40, 20);
+            printf("╔══════════════════════════════════════════════════════╗");
+            gotoxy(40, 21);
+            printf("║  Login successful: Employee authenticated.           ║");
+            gotoxy(40, 22);
+            printf("╚══════════════════════════════════════════════════════╝");
+            textcolor(7);
+            fclose(file);
+            return 1;
+        } else {
+
+            textcolor(4);
+            gotoxy(40, 20);
+            printf("╔══════════════════════════════════════════════════════╗");
+            gotoxy(40, 21);
+            printf("║  Login failed: Incorrect credentials.                ║");
+            gotoxy(40, 22);
+            printf("╚══════════════════════════════════════════════════════╝");
+            textcolor(7);
+            attempts++;
+            gotoxy(40, 24);
+            printf("You have %d attempt(s) remaining.", 3 - attempts);
+            getch();
         }
     }
 
     fclose(file);
 
-    // Résultat affiché avec le design
-    if (found) {
-        textcolor(10); // Vert pour succès
-        gotoxy(40, 20);
-        printf("╔══════════════════════════════════════════════════════╗");
-        gotoxy(40, 21);
-        printf("║  Login réussi : L'employé existe dans le système.    ║");
-        gotoxy(40, 22);
-        printf("╚══════════════════════════════════════════════════════╝");
-        textcolor(7); // Réinitialisation
-        return 1; // Succès
-    } else {
-        textcolor(4); // Rouge pour erreur
-        gotoxy(40, 20);
-        printf("╔══════════════════════════════════════════════════════╗");
-        gotoxy(40, 21);
-        printf("║  Login échoué : Aucun employé trouvé.                ║");
-        gotoxy(40, 22);
-        printf("╚══════════════════════════════════════════════════════╝");
-        textcolor(7); // Réinitialisation
-        return 0; // Échec
-    }
+
+    textcolor(4);
+    system("cls");
+    gotoxy(40, 20);
+    printf("╔══════════════════════════════════════════════════════╗");
+    gotoxy(40, 21);
+    printf("║  Access denied: Too many failed login attempts.      ║");
+    gotoxy(40, 22);
+    printf("╚══════════════════════════════════════════════════════╝");
+    textcolor(7);
+    return 0;
 }
 
 
- void menuBasket() {
+ /*void menuBasket() {
     int i;
 
     textcolor(2);
@@ -489,7 +541,7 @@ int verifierLoginEmploye() {
     printf("╚═══╝");
 
     textcolor(7);
-}
+}*/
 struct bill bil;
 
 void bill() {
@@ -570,143 +622,209 @@ void bill() {
     getch(); // Attendre une touche de l'utilisateur
 }
 
-void createOrdonnancesFile() {
-    FILE *file = fopen("ordonnances.txt", "w");
-    if (file == NULL) {
-        printf("Error: unable to create the file.\n");
-        return;
-    }
-
-    // Writing sample ordonnances data to the file
-    fprintf(file, "Dr. Sophie Martin|Cardiologue|123 Rue de la Santé, 75015 Paris|+33 1 45 67 89 10|Signature_Sophie|12345678901|2024-11-14|2025-02-14\n");
-    fprintf(file, "Dr. Jean Dupont|Dermatologue|98 Avenue Beaumarchais, 75011 Paris|+33 1 55 23 45 67|Signature_Jean|98765432101|2024-10-01|2025-04-01\n");
-    fprintf(file, "Dr. Claire Lefevre|Généraliste|27 Rue de la Liberté, 59000 Lille|+33 3 20 55 88 99|Signature_Claire|11223344556|2024-09-20|2025-09-20\n");
-
-    printf("File 'ordonnances.txt' has been created with sample data.\n");
-    fclose(file);
-}
 
 
 // Function to verify ordonnance information entered by a client
 void verifyOrdonnance() {
-    printf("\033[1;36m");
-    gotoxy(53,1); printf("*                             * ");
-    gotoxy(53,2); printf("*        PHARMACY SYSTEM      * ");
-    gotoxy(53,3); printf("*                             * ");
-    gotoxy(53,4); printf("*******************************  ");
+    system("cls");
+
+
+    textcolor(14);
+    int i;
+    for (i = 3; i < 28; i++) {
+        gotoxy(25, i);
+        printf("║");
+        gotoxy(110, i);
+        printf("║");
+    }
+    for (i = 25; i < 111; i++) {
+        gotoxy(i, 3);
+        printf("═");
+        gotoxy(i, 28);
+        printf("═");
+    }
+    gotoxy(25, 3);
+    printf("╔");
+    gotoxy(110, 3);
+    printf("╗");
+    gotoxy(25, 28);
+    printf("╚");
+    gotoxy(110, 28);
+    printf("╝");
+
+
+    textcolor(10);
+    gotoxy(43, 5);
+    printf("===============================================");
+    gotoxy(45, 6);
+    printf("              VERIFY ORDONNANCE                ");
+    gotoxy(43, 7);
+    printf("===============================================");
+
+
+    textcolor(14);
+    gotoxy(35, 9);
+    printf("╔══════════════════════════════════════════════╗");
+    gotoxy(35, 10);
+    printf("║                INPUT DETAILS                 ║");
+    gotoxy(35, 11);
+    printf("╚══════════════════════════════════════════════╝");
+
+
+    textcolor(7);
+    gotoxy(35, 13);
+    printf("Doctor's Name: ");
+    gotoxy(35, 14);
+    printf("Specialty: ");
+    gotoxy(35, 15);
+    printf("RPPS Number: ");
+    gotoxy(35, 16);
+    printf("Prescription Date: ");
 
     struct Ordonnance *inputOrdonnance = malloc(sizeof(struct Ordonnance));
     if (inputOrdonnance == NULL) {
+        textcolor(4);
+        gotoxy(50, 18);
         printf("Memory allocation error.");
         return;
     }
 
+   gotoxy(55, 13);
+fgets(inputOrdonnance->doctor_name, sizeof(inputOrdonnance->doctor_name), stdin);
+inputOrdonnance->doctor_name[strcspn(inputOrdonnance->doctor_name, "\n")] = '\0'; // Supprime le caractère '\n'
+
+gotoxy(55, 14);
+fgets(inputOrdonnance->specialty, sizeof(inputOrdonnance->specialty), stdin);
+inputOrdonnance->specialty[strcspn(inputOrdonnance->specialty, "\n")] = '\0';
+
+gotoxy(55, 15);
+fgets(inputOrdonnance->rpps_number, sizeof(inputOrdonnance->rpps_number), stdin);
+inputOrdonnance->rpps_number[strcspn(inputOrdonnance->rpps_number, "\n")] = '\0';
+
+gotoxy(55, 16);
+fgets(inputOrdonnance->prescription_date, sizeof(inputOrdonnance->prescription_date), stdin);
+inputOrdonnance->prescription_date[strcspn(inputOrdonnance->prescription_date, "\n")] = '\0';
+
+
     FILE *file = fopen("ordonnances.txt", "r");
     if (file == NULL) {
+        textcolor(4);
+        gotoxy(50, 18);
         printf("Error opening the file.");
         free(inputOrdonnance);
         return;
     }
 
-    // Design for user input section
-    printf("\033[1;33m\n\n\n");
-    int i;
-    for (i = 11; i < 20; i++) {
-        gotoxy(48, i); printf("³");
-        gotoxy(92, i); printf("³");
-    }
-    for (i = 50; i < 91; i++) {
-        gotoxy(i, 20); printf("Ä");
-    }
-    gotoxy(48, 11); printf("*");
-    gotoxy(92, 11); printf("*");
-    gotoxy(48, 20); printf("*");
-    gotoxy(92, 20); printf("*");
-
-    gotoxy(50, 10); printf("         ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿ ");
-    gotoxy(50, 11); printf("ÄÄÄÄÄÄÄÄÄ´   Ordonnance Input  ÃÄÄÄÄÄÄÄÄÄ");
-    gotoxy(50, 12); printf("         ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ");
-
-    printf("\033[1;31m");
-    gotoxy(55, 15); printf("Doctor's Name: ");
-    gotoxy(55, 16); printf("Specialty: ");
-    gotoxy(55, 17); printf("RPPS Number: ");
-    gotoxy(55, 18); printf("Prescription Date: ");
-    printf("\033[0m");
-
-    gotoxy(72, 15); scanf("%49s", inputOrdonnance->doctor_name);
-    gotoxy(72, 16); scanf("%29s", inputOrdonnance->specialty);
-    gotoxy(72, 17); scanf("%19s", inputOrdonnance->rpps_number);
-    gotoxy(72, 18); scanf("%14s", inputOrdonnance->prescription_date);
-
-    // Read through each line in the file and compare
     struct Ordonnance fileOrdonnance;
     int found = 0;
+
+
 
     while (fscanf(file, "%49[^|]|%29[^|]|%99[^|]|%19[^|]|%49[^|]|%19[^|]|%14[^|]|%14[^\n]\n",
                   fileOrdonnance.doctor_name, fileOrdonnance.specialty, fileOrdonnance.cabinet_address,
                   fileOrdonnance.cabinet_phone, fileOrdonnance.signature, fileOrdonnance.rpps_number,
                   fileOrdonnance.prescription_date, fileOrdonnance.validity_period) != EOF) {
+
         if (strcmp(inputOrdonnance->doctor_name, fileOrdonnance.doctor_name) == 0 &&
             strcmp(inputOrdonnance->specialty, fileOrdonnance.specialty) == 0 &&
             strcmp(inputOrdonnance->rpps_number, fileOrdonnance.rpps_number) == 0 &&
             strcmp(inputOrdonnance->prescription_date, fileOrdonnance.prescription_date) == 0) {
 
-            system("cls"); // Clear screen
-            printf("\033[1;36m");
-            gotoxy(53,1); printf("*                             * ");
-            gotoxy(53,2); printf("*        PHARMACY SYSTEM      * ");
-            gotoxy(53,3); printf("*                             * ");
-            gotoxy(53,4); printf("*******************************  ");
-            printf("\033[0;35m");
-            printf("\n\n\n\n\t\t\t\t\t\t   | Verified Ordonnance |\n");
-            printf("\t\t\t\t\t\t    ---------------------\n");
-            printf("\033[0m");
-
-            printf("\tDoctor's Name: %s\n", fileOrdonnance.doctor_name);
-            printf("\tSpecialty: %s\n", fileOrdonnance.specialty);
-            printf("\tCabinet Address: %s\n", fileOrdonnance.cabinet_address);
-            printf("\tCabinet Phone: %s\n", fileOrdonnance.cabinet_phone);
-            printf("\tSignature: %s\n", fileOrdonnance.signature);
-            printf("\tRPPS Number: %s\n", fileOrdonnance.rpps_number);
-            printf("\tPrescription Date: %s\n", fileOrdonnance.prescription_date);
-            printf("\tValidity Period: %s\n", fileOrdonnance.validity_period);
-
             found = 1;
+
+
+             textcolor(2);
+            for (i = 3; i < 28; i++) {
+                gotoxy(25, i);
+                printf("║");
+                gotoxy(110, i);
+                printf("║");
+            }
+            for (i = 25; i < 111; i++) {
+                gotoxy(i, 3);
+                printf("═");
+                gotoxy(i, 28);
+                printf("═");
+            }
+            gotoxy(25, 3);
+            printf("╔");
+            gotoxy(110, 3);
+            printf("╗");
+            gotoxy(25, 28);
+            printf("╚");
+            gotoxy(110, 28);
+            printf("╝");
+
+            textcolor(10);
+            gotoxy(50, 5);
+            printf("===============================================");
+            gotoxy(50, 6);
+            printf("            ORDONNANCE VERIFIED                ");
+            gotoxy(50, 7);
+            printf("===============================================");
+
+            textcolor(7);
+            gotoxy(30, 10);
+            printf("Doctor's Name: %s", fileOrdonnance.doctor_name);
+            gotoxy(30, 11);
+            printf("Specialty: %s", fileOrdonnance.specialty);
+            gotoxy(30, 12);
+            printf("Cabinet Address: %s", fileOrdonnance.cabinet_address);
+            gotoxy(30, 13);
+            printf("Cabinet Phone: %s", fileOrdonnance.cabinet_phone);
+            gotoxy(30, 14);
+            printf("Signature: %s", fileOrdonnance.signature);
+            gotoxy(30, 15);
+            printf("RPPS Number: %s", fileOrdonnance.rpps_number);
+            gotoxy(30, 16);
+            printf("Prescription Date: %s", fileOrdonnance.prescription_date);
+            gotoxy(30, 17);
+            printf("Validity Period: %s", fileOrdonnance.validity_period);
+
             break;
         }
     }
 
     if (!found) {
-        printf("No matching ordonnance found.\n");
+        textcolor(4);
+        gotoxy(40, 22);
+        printf("No matching ordonnance found.");
+        textcolor(7);
     }
 
     fclose(file);
     free(inputOrdonnance);
+
+
+    gotoxy(40, 25);
+    textcolor(7);
+    printf("\n\n\n\n\n\n\n\n\n\n Press any key to return...");
+    getch();
 }
 
-void displayMedicines() {
-   FILE *file = fopen("medicaments1.txt", "r");
+void displayMedicines1() {
+    FILE *file = fopen("medicenes.txt", "r");
     if (file == NULL) {
-        textcolor(12); // Rouge pour les erreurs
-        printf("File 'medicaments1.txt' not found . .\n");
-
-
+        textcolor(12);
+        printf("File 'medicenes.txt' not found . .\n");
+        getch();
+        return;
     }
 
-    system("cls"); // Clear the screen
+    system("cls");
 
-    // Title box
-    textcolor(2); // Green for borders
+
+    textcolor(14);
     gotoxy(25, 2);
     printf("╔═════════════════════════════════════════════════════════════════════════╗");
     gotoxy(25, 3);
+    textcolor(10);
     printf("║                           PHARMACY SYSTEM                               ║");
+    textcolor(14);
     gotoxy(25, 4);
     printf("╚═════════════════════════════════════════════════════════════════════════╝");
 
-    // Table header
-    textcolor(14); // Yellow for header
+    textcolor(14);
     gotoxy(25, 6);
     printf("╔═══════╦══════════════════════╦══════════╦══════════╦════════════════════╗");
     gotoxy(25, 7);
@@ -714,47 +832,48 @@ void displayMedicines() {
     gotoxy(25, 8);
     printf("╠═══════╬══════════════════════╬══════════╬══════════╬════════════════════╣");
 
-    // Variables for table positioning
-    int row = 9; // Start displaying data from row 9
+    int row = 9;
 
-    struct medical med;
 
-    // Read and display selected information for each medicine
-    textcolor(7); // White for table content
-    while (fscanf(file, "%5s %19s %d %f %14s",
-                  med.id, med.medi_name, &med.quantity, &med.cost, med.exp_date) == 5) {
+    while (fscanf(file, "%5s %19s %d %d %d %f %f %f %14s %29s",
+                  med.id, med.medi_name, &med.quantity, &med.id_prescription,
+                  &med.quantity_sold, &med.cost, &med.profit, &med.purchase_price,
+                  med.exp_date, med.supplier_name) == 10) {
+        textcolor(7);
         gotoxy(25, row);
         printf("║ %-5s ║ %-20s ║ %-8d ║ %-8.2f ║ %-18s ║",
                med.id, med.medi_name, med.quantity, med.cost, med.exp_date);
 
-        row++; // Move to the next row
+        row++;
 
-        // Add horizontal line after every 5 rows for better readability
+
         if ((row - 9) % 5 == 0) {
+            textcolor(14);
             gotoxy(25, row);
             printf("╟───────┼──────────────────────┼──────────┼──────────┼────────────────────╢");
             row++;
         }
     }
 
-    // Add table bottom border
+    textcolor(14);
     gotoxy(25, row);
     printf("╚═══════╩══════════════════════╩══════════╩══════════╩════════════════════╝");
 
     fclose(file);
 
-    // Prompt to return to the menu
-    textcolor(10); // Green for success
+
+    textcolor(10);
     gotoxy(40, row + 2);
     printf("Press any key to return to the menu...");
-    textcolor(7); // Reset to default
-    getch(); // Wait for a key press
+    textcolor(7);
+    getch();
 }
 
-//fonction pour creer un administrateur //
-void createAdmin() {
 
-    textcolor(2);
+void createAdmin() {
+    system("cls");
+
+    textcolor(14);
     int i;
 
 
@@ -771,87 +890,76 @@ void createAdmin() {
     gotoxy(25, 28); printf("╚");
     gotoxy(110, 28); printf("╝");
 
-
     textcolor(2);
-    gotoxy(40, 2);
-    printf("╔════════════════════════════════════════════╗");
-    gotoxy(40, 3);
-    printf("║          WELCOME TO PHARMACY SYSTEM        ║");
-    gotoxy(40, 4);
-    printf("╚════════════════════════════════════════════╝");
+    gotoxy(40, 5);
+    printf("=============================================");
+    textcolor(10);
+    gotoxy(40, 6);
+    printf("        WELCOME TO OUR PHARMACY SYSTEM       ");
+    textcolor(2);
+    gotoxy(40, 7);
+    printf("=============================================");
 
 
     textcolor(13);
-    gotoxy(35, 6);
+    gotoxy(35, 9);
     printf("No administrator found in the system. Please create one.");
-
-
     textcolor(14);
-    gotoxy(40, 10);
-    printf("╔══════════════════════════════════════╗");
-    gotoxy(40, 11);
-    printf("║ Admin ID:                            ║");
     gotoxy(40, 12);
-    printf("╚══════════════════════════════════════╝");
-
-    textcolor(14);
+    printf("╔══════════════════════════════════════╗");
+    gotoxy(40, 13);
+    printf("║ Admin ID:                            ║");
     gotoxy(40, 14);
-    printf("╔══════════════════════════════════════╗");
-    gotoxy(40, 15);
-    printf("║ Name:                                ║");
-    gotoxy(40, 16);
     printf("╚══════════════════════════════════════╝");
 
-
-    textcolor(14);
-    gotoxy(40, 18);
+    gotoxy(40, 16);
     printf("╔══════════════════════════════════════╗");
-    gotoxy(40, 19);
-    printf("║ Password:                            ║");
+    gotoxy(40, 17);
+    printf("║ Name:                                ║");
+    gotoxy(40, 18);
+    printf("╚══════════════════════════════════════╝");
+
     gotoxy(40, 20);
+    printf("╔══════════════════════════════════════╗");
+    gotoxy(40, 21);
+    printf("║ Password:                            ║");
+    gotoxy(40, 22);
     printf("╚══════════════════════════════════════╝");
 
 
     struct admin newAdmin;
     newAdmin.admin_id = 1;
 
-
     textcolor(7);
-    gotoxy(53, 11);
+    gotoxy(53, 13);
     printf("%d", newAdmin.admin_id);
-
-
-    gotoxy(48, 15);
+    gotoxy(48, 17);
     fgets(newAdmin.admin_name, 20, stdin);
     newAdmin.admin_name[strcspn(newAdmin.admin_name, "\n")] = 0;
 
-
-    gotoxy(52, 19);
+    gotoxy(52, 21);
     fgets(newAdmin.password, 20, stdin);
     newAdmin.password[strcspn(newAdmin.password, "\n")] = 0;
 
-
-    FILE *file = fopen("admins.txt", "a");
+    // Enregistrement des données dans le fichier
+    FILE *file = fopen("admins1.txt", "a");
     if (file != NULL) {
-        fprintf(file, "Admin ID: %d\n", newAdmin.admin_id);
-        fprintf(file, "Name: %s\n", newAdmin.admin_name);
-        fprintf(file, "Password: %s\n", newAdmin.password);
+        fprintf(file, "%d %s %s\n", newAdmin.admin_id, newAdmin.admin_name, newAdmin.password);
         fclose(file);
     }
 
-
+    // Confirmation de la création de l'admin
     textcolor(10);
-    gotoxy(40, 23);
-    printf("╔══════════════════════════════════════════════╗");
-    gotoxy(40, 24);
-    printf("║  Pharmacy administrator created successfully! ║");
     gotoxy(40, 25);
+    printf("╔══════════════════════════════════════════════╗");
+    gotoxy(40, 26);
+    printf("║  Pharmacy administrator created successfully! ║");
+    gotoxy(40, 27);
     printf("╚══════════════════════════════════════════════╝");
-    printf("\n\n\n\n\n\n\n\n\n");
+
 
     textcolor(7);
 }
-
 
 void createCustomerAccount() {
     printf("\033[1;36m");
@@ -945,7 +1053,7 @@ void createCustomerAccount() {
 
 int verifyCustomerLogin(int customerId, char *mobileNo) {
     struct customer storedCustomer;
-    FILE *file = fopen("pharmacy_customers.txt", "r");
+    FILE *file = fopen("pharmacy_customers.txt", "r+");
 
     if (!file) {
         printf("Error: Unable to open customer file.\n");
@@ -1059,124 +1167,63 @@ int verifyCustomerLogin(int customerId, char *mobileNo) {
 
 }
 void menuP() {
-    int i;
+    system("cls");
+
+    textcolor(14);
+    for (int i = 3; i <= 25; i++) {
+        gotoxy(20, i); printf("║");
+        gotoxy(90, i); printf("║");
+    }
+    for (int i = 20; i <= 90; i++) {
+        gotoxy(i, 3); printf("═");
+        gotoxy(i, 25); printf("═");
+    }
+    gotoxy(20, 3); printf("╔");
+    gotoxy(90, 3); printf("╗");
+    gotoxy(20, 25); printf("╚");
+    gotoxy(90, 25); printf("╝");
 
 
     textcolor(2);
-    for (i = 3; i < 28; i++) {
-        gotoxy(25, i);
-        printf("║");
-        gotoxy(110, i);
-        printf("║");
-    }
+    gotoxy(30, 4);
+    printf("=============================================");
 
-    for (i = 26; i < 111; i++) {
-        gotoxy(i, 28);
-        printf("═");
-    }
-
-    for (i = 26; i < 52; i++) {
-        gotoxy(i, 3);
-        printf("═");
-    }
-
-    for (i = 80; i < 110; i++) {
-        gotoxy(i, 3);
-        printf("═");
-    }
-
-    gotoxy(25, 3);
-    printf("╔");
-    gotoxy(110, 3);
-    printf("╗");
-    gotoxy(25, 28);
-    printf("╚");
-    gotoxy(110, 28);
-    printf("╝");
 
     textcolor(10);
-    gotoxy(53, 2);
-    printf("╔══════════════════════════════╗");
-    gotoxy(53, 3);
-    printf("║       PHARMACY SYSTEM        ║");
-    gotoxy(53, 4);
-    printf("╚══════════════════════════════╝");
+    gotoxy(30, 5);
+    printf("      WELCOME TO OUR PHARMACY SYSTEM         ");
+    gotoxy(30, 6);
+    textcolor(2);
+    printf("=============================================");
 
 
     textcolor(14);
-    for (i = 11; i < 25; i++) {
-        gotoxy(45, i);
-        printf("║");
-        gotoxy(90, i);
-        printf("║");
-    }
-
-    for (i = 46; i < 90; i++) {
-        gotoxy(i, 25);
-        printf("═");
-    }
-    gotoxy(45, 25);
-    printf("╚");
-    gotoxy(90, 25);
-    printf("╝");
-
-    for (i = 46; i < 90; i++) {
-        gotoxy(i, 10);
-        printf("═");
-    }
-    gotoxy(45, 10);
-    printf("╔");
-    gotoxy(90, 10);
-    printf("╗");
-
-
-    textcolor(14);
-    gotoxy(58, 9);
-    printf("╔════════════════╗");
-    gotoxy(58, 10);
-    printf("║      MENU      ║");
-    gotoxy(58, 11);
-    printf("╚════════════════╝");
-
-
-    textcolor(15);
-    gotoxy(58, 14);
-    printf("1. Admin");
-
-    gotoxy(58, 16);
-    printf("2. Employee");
-
-    gotoxy(58, 18);
-    printf("3. Customer");
-
-    gotoxy(58, 20);
-    printf("4. Exit");
+    gotoxy(40, 10); printf("1. ADMIN   ");
+    gotoxy(40, 12); printf("2. EMPLOYEE");
+    gotoxy(40, 14); printf("3. CUSTOMER");
+    gotoxy(40, 16); printf("4. EXIT    ");
 
 
     textcolor(7);
-    gotoxy(65, 22);
-    printf("╔═══╗");
-    gotoxy(65, 23);
-    printf("║   ║");
-    gotoxy(65, 24);
-    printf("╚═══╝");
+    gotoxy(28, 22);
+    printf("\n\n\n\n\n\n\n\n\n\n\n\nPRESS THE NUMBER OF THE OPTION THAT WHAT YOU WANT .........?\n\n");
 
 
     textcolor(7);
 }
 void menuprincipale() {
     int choix = 0;
-    FILE *file = fopen("admins.txt", "r");
+    FILE *file = fopen("admins1.txt", "r");
 
     // Si le fichier administrateur n'existe pas, on crée un administrateur
     if (file == NULL) {
-        createAdmin(); // Fonction à implémenter ailleurs
+        createAdmin();
         return;
     }
     fclose(file);
 
-    // Affichage du menu principal stylisé
-    menuP(); // Fonction du menu principal (cadre)
+    // Affichage du menu principal
+    menuP();
 
     while (choix != 4) {
         gotoxy(67, 23);
@@ -1201,12 +1248,12 @@ void menuprincipale() {
                 break;
 
             case 2:
-    if (verifierLoginEmploye() == 1) {
+    if (verifyLoginEmployee() == 1) {
         system("cls");
         menuEmploye();
     } else {
         system("cls");
-        menuEmploye();
+        menuP();
         textcolor(12);
         gotoxy(43, 27);
         printf("Login échoué. Retour au menu principal.");
@@ -1215,7 +1262,7 @@ void menuprincipale() {
                 break;
 
             case 3:
-               menu();
+              // menu_client();
                 break;
             case 4:
                 system("cls");

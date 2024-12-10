@@ -6,14 +6,13 @@
 #include"menu login.h"
 #include"menu_adm.h"
 #include"interface.h"
-#include"searcheByClient.h"
-#include"repport.h"
 #include"menu_client.h"
+#include <unistd.h>
 int main(){
+//system("cls");
 //SetConsoleOutputCP(65001);
-  //menuprincipale();
-  med_list *head = NULL;
-  //main_menu();
-        return 0;
+//menuprincipale();
+//main_menu();
 
+        return 0;
 }
