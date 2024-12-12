@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1727628710 source:c:\users\pc\onedrive\documents\salma langage c\introduction1\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

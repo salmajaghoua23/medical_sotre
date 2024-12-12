@@ -1,0 +1,1 @@
+insert into person(id,nom,prenom,email,age) values(5,'hiba','chtioui','hibahiba22@',22)

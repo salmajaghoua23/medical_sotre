@@ -1,3 +1,0 @@
-Admin ID: 1
-Name: salma
-Password: 2004

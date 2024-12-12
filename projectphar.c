@@ -9,10 +9,6 @@
 #include"menu_client.h"
 #include <unistd.h>
 int main(){
-//system("cls");
-//SetConsoleOutputCP(65001);
-//menuprincipale();
-//main_menu();
-
-        return 0;
+   //report_menu();
+ return 0;
 }
