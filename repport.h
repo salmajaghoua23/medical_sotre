@@ -1,6 +1,5 @@
 #ifndef REPPORT_H_INCLUDED
 #define REPPORT_H_INCLUDED
-#include <time.h>
 #include "interface.h"
 #include "employer.h"
 #include "medical.h"
@@ -12,21 +11,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <windows.h>
 #include"interface.h"
+#include"menu_adm.h"
 #include <unistd.h>
+typedef struct medical2 {
+    char id[6];
+    char medi_name[20];
+    int quantity;
+    int id_prescription;
+    int quantity_sold;
+    float cost;
+    float profit;
+    float purchase_price;
+	 float sale_price; 
+    char exp_date[15];
+    char supplier_name[30];
+} medical2;
 
-// Définition de la structure des ventes
+
+// Linked list structure
+typedef struct node1 {
+    medical2 data;
+    struct node1 *next;
+} med_list1;
+//Définition de la structure des ventes
 typedef struct vente {
     char id_medicament[6];
     int quantite;
     char date_vente[11]; // Format YYYY-MM-DD
     struct vente *next;
 } vente_list;
-
-// Fonction pour ajouter un médicament
-med_list* ajouterMedicament(med_list *head, medical med) {
-    med_list* nouveau = (med_list*)malloc(sizeof(med_list));
+med_list1* ajouterMedicament(med_list1 *head, medical2 med) {
+    med_list1* nouveau = (med_list1*)malloc(sizeof(med_list1));
     if (!nouveau) {
         printf("Memory allocation error.\n");
         exit(EXIT_FAILURE);
@@ -35,10 +53,22 @@ med_list* ajouterMedicament(med_list *head, medical med) {
     nouveau->next = head;
     return nouveau;
 }
+void report_menu();
+void afficherStock(med_list1 *head);
+void afficherMenuRapport();
+void rapportVentesHebdomadaires(vente_list *head);
+void medicamentLePlusVendu(med_list1 *head);
+void afficherGraphiqueStock(med_list1 *head);
+void afficherGraphiqueVentesHebdomadaires(vente_list *head);
+med_list1* ajouterMedicament(med_list1 *head, medical2 med);
+void gotoxy1(int x, int y);
+void textcolor(int color);
+void box();
+// Fonction pour ajouter un médicament
 
 // Fonction pour enregistrer une vente dans la liste et dans un fichier
-void enregistrerVente(med_list *head, vente_list **ventes_head, char id[], int quantite, char date_vente[]) {
-    med_list* temp = head;
+void enregistrerVente(med_list1 *head, vente_list **ventes_head, char id[], int quantite, char date_vente[]) {
+    med_list1* temp = head;
     while (temp != NULL) {
         if (strcmp(temp->data.id, id) == 0) {
             if (temp->data.quantity >= quantite) {
@@ -75,34 +105,33 @@ void enregistrerVente(med_list *head, vente_list **ventes_head, char id[], int q
     }
     printf("Medicine with ID %s not found.\n", id);
 }
-
 // Fonction pour afficher le stock restant
-void afficherStock(med_list *head) {
-    med_list* temp = head;
-    int row = 3;  // Position de départ pour afficher les médicaments
+void afficherStock(med_list1 *head) {
+    med_list1* temp = head;
+    int row = 2;  // Position de départ pour afficher les médicaments
 
     // Affichage du cadre de la table
     box();  // Assurez-vous que cette fonction affiche la boîte sans dépasser
 
     // Titre
-    gotoxy(20,2 );
+    gotoxy(30, 0);
     textcolor(2);
     printf("-----Remaining stock by medicine:------\n");
 
     // Affichage de la ligne du tableau (bordure)
-    gotoxy(10, row);
+    gotoxy(30, row);
     textcolor(14);
-    printf("+-----------------+------------------+------------------+");
+    printf("========================================================");
     row++;
 
     // Affichage de l'en-tête du tableau
-    gotoxy(10, row);
-    textcolor(14);
+    gotoxy(30, row);
+    textcolor(15);
     printf("| %-15s | %-16s | %-16s |", "Medicine Name", "Stock Quantity", "Unit Price");
     row++;
 
     // Affichage de la ligne de séparation après l'en-tête
-    gotoxy(10, row);
+    gotoxy(30, row);
     textcolor(14);
     printf("+-----------------+------------------+------------------+");
     row++;
@@ -110,13 +139,13 @@ void afficherStock(med_list *head) {
     // Affichage des médicaments
     while (temp != NULL) {
         // Affichage des informations du médicament dans chaque ligne
-        gotoxy(10, row);
+        gotoxy(30, row);
         textcolor(15);
         printf("| %-15s | %-16d | %-16.2f |", temp->data.medi_name, temp->data.quantity, temp->data.purchase_price);
         row++;
 
         // Affichage de la ligne de séparation après chaque ligne de médicament
-        gotoxy(10, row);
+        gotoxy(30, row);
         textcolor(14);
         printf("+-----------------+------------------+------------------+");
         row++;
@@ -126,30 +155,16 @@ void afficherStock(med_list *head) {
 
     // Si aucun médicament n'est trouvé
     if (head == NULL) {
-        gotoxy(10, row);
+        gotoxy(30, row);
         textcolor(12);
         printf("No medicines available in stock.\n");
     }
 }
-
 // Fonction pour afficher les ventes hebdomadaires
-int calculerNumeroSemaine(const char* date) {
-    struct tm tm = {0};
-    // Analyse manuelle de la date au format YYYY-MM-DD
-    sscanf(date, "%d-%d-%d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday);
-    tm.tm_year -= 1900;  // Ajustement pour struct tm (année relative à 1900)
-    tm.tm_mon -= 1;      // Mois entre 0 (janvier) et 11 (décembre)
-
-    // Calcul du numéro de semaine
-    mktime(&tm);
-    return tm.tm_yday / 7 + 1; // Numéro de semaine approximatif
-}
-
-
 void rapportVentesHebdomadaires(vente_list *head) {
     int ventes_par_semaine[52] = {0};
     vente_list* temp = head;
-
+    box();
     while (temp != NULL) {
         int annee, mois, jour;
         sscanf(temp->date_vente, "%d-%d-%d", &annee, &mois, &jour);
@@ -157,79 +172,163 @@ void rapportVentesHebdomadaires(vente_list *head) {
         ventes_par_semaine[semaine] += temp->quantite;
         temp = temp->next;
     }
-
-    // Écrire les données dans un fichier pour GNUPLOT
-    FILE *dataFile = fopen("ventes_hebdo.dat", "w");
-    if (!dataFile) {
-        printf("Error: Unable to create the data file.\n");
-        exit(EXIT_FAILURE);
-    }
-
+    gotoxy(30, 10);
+    textcolor(2);
+    printf("-----Weekly Sales Report------\n");
+    textcolor(14);
+    
     for (int i = 0; i < 52; i++) {
         if (ventes_par_semaine[i] > 0) {
-            fprintf(dataFile, "%d %d\n", i + 1, ventes_par_semaine[i]);
+            printf("\t\t\t Week %d: | \t\t %d sales\n", i + 1, ventes_par_semaine[i]);
         }
     }
-    fclose(dataFile);
+    printf("\n\n\n\n\n\n");
+}
+#define MAX_MEDICAMENTS_PAR_PAGE 5  // Limite de médicaments par page
+// Fonction pour afficher une page de médicaments
+void afficher_page(medical2 *med_array, int page, int total_meds) {
+    system("cls");
+    box();
+    textcolor(2);
+    gotoxy(40, 9);
+    printf("----- Best-Selling Medicines -----\n");
 
-    // Générer le graphique GNUPLOT
-    FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
-    if (!gnuplotPipe) {
-        printf("Error: Unable to launch GNUPLOT.\n");
-        exit(EXIT_FAILURE);
-    }
+    int start = page * MAX_MEDICAMENTS_PAR_PAGE;
+    int end = start + MAX_MEDICAMENTS_PAR_PAGE;
+    if (end > total_meds) end = total_meds;
 
-    fprintf(gnuplotPipe, "set title 'Weekly Sales Report'\n");
-    fprintf(gnuplotPipe, "set xlabel 'Weeks'\n");
-    fprintf(gnuplotPipe, "set ylabel 'Quantity Sold'\n");
-    fprintf(gnuplotPipe, "set grid\n");
-    fprintf(gnuplotPipe, "set style data linespoints\n");
-    fprintf(gnuplotPipe, "plot 'ventes_hebdo.dat' using 1:2 with linespoints title 'Weekly Sales'\n");
-
-    pclose(gnuplotPipe);
-    remove("ventes_hebdo.dat");
-
-    // Afficher les données dans la console
-    printf("----- Weekly Sales Report -----\n");
-    for (int i = 0; i < 52; i++) {
-        gotoxy(20,10);
+    int row = 11;
+    for (int i = start; i < end; i++) {
+        gotoxy(30, row++);
         textcolor(15);
-        if (ventes_par_semaine[i] > 0) {
-            printf("\tWeek %d:\n\n\t\t\t%d sales\n", i + 1, ventes_par_semaine[i]);
-        }
+        printf("%d. %-18s | Sold: %-5d | Profit: %.2f\n", i + 1, med_array[i].medi_name, med_array[i].quantity_sold, med_array[i].profit);
+    }
+    
+    // Si la page suivante existe, demander à l'utilisateur de passer à la page suivante
+    if (end < total_meds) {
+        gotoxy(30, row++);
+        printf("Press 'n' for next page...\n");
     }
 }
 
+// Fonction pour afficher un graphique avec GNUPLOT
+void plot_graph(medical2 *med_array, int count) {
+    // Créer un fichier temporaire pour GNUPLOT
+    FILE *temp_file = fopen("medicines_data.txt", "w");
+    if (temp_file == NULL) {
+        printf("Erreur d'ouverture du fichier temporaire.\n");
+        return;
+    }
+    // Écrire les données des médicaments dans le fichier
+    for (int i = 0; i < count; i++) {
+        fprintf(temp_file, "%d %d\n", i + 1, med_array[i].quantity_sold);
+    }
+    fclose(temp_file);
 
-#define MAX_MEDICAMENTS_PAR_PAGE 5
+    // Créer une commande pour GNUPLOT
+    FILE *gnupipe = popen("gnuplot -persistent", "w");
+    if (gnupipe == NULL) {
+        printf("Erreur d'ouverture du pipe GNUPLOT.\n");
+        return;
+    }
+   printf("\t\tOpening GNUPLOT...\n");
+
+fprintf(gnupipe, "set title 'Top-Selling Medicines'\n");
+    fprintf(gnupipe, "set xlabel 'Medicine'\n");
+    fprintf(gnupipe, "set ylabel 'Quantity Sold'\n");
+    fprintf(gnupipe, "set xtics rotate by -45\n");
+    fprintf(gnupipe, "set style fill solid 1.0 border -1\n");  // Remplir les barres avec une couleur solide
+    fprintf(gnupipe, "plot 'medicines_data.txt' using 1:2 with boxes title 'Quantity Sold'\n");
+    fclose(gnupipe);
+
+}
+// Fonction pour afficher les médicaments les plus vendus
+void medicamentLePlusVendu(med_list1 *head) {
+    int count = 0;
+    med_list1 *temp = head;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+
+    if (count == 0) {
+        gotoxy(40, 10);
+        printf("No medicines available.\n");
+        return;
+    }
+
+    // Tableau de médicaments trié
+    medical2 *med_array = (medical2 *)malloc(count * sizeof(medical2));
+    if (!med_array) {
+        printf("Erreur d'allocation mémoire.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    temp = head;
+    for (int i = 0; i < count; i++) {
+        med_array[i] = temp->data;
+        temp = temp->next;
+    }
+
+    // Trier les médicaments par quantité vendue
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (med_array[j].quantity_sold < med_array[j + 1].quantity_sold) {
+                medical2 temp_med = med_array[j];
+                med_array[j] = med_array[j + 1];
+                med_array[j + 1] = temp_med;
+            }
+        }
+    }
+
+    // Affichage des médicaments par page
+    int total_pages = (count + MAX_MEDICAMENTS_PAR_PAGE - 1) / MAX_MEDICAMENTS_PAR_PAGE;
+    int page = 0;
+    char choice;
+    do {
+        afficher_page(med_array, page, count);
+
+        // Afficher le graphique
+        plot_graph(med_array, count);
+
+        // Gérer la navigation entre les pages
+        if (page < total_pages - 1) {
+            choice = getchar();
+            if (choice == 'n' || choice == 'N') {
+                page++;
+            }
+        }
+
+    } while (choice == 'n' || choice == 'N');
+     printf("\n\n\n\n\n\n");
+    free(med_array);
+}
+
 // Fonction pour afficher le menu de rapport
 void afficherMenuRapport() {
     system("cls");
     box();
     textcolor(14);
-    gotoxy1(20, 5);
+    gotoxy1(40, 5);
     printf("------------------------");
-    gotoxy1(20, 6);
+    gotoxy1(40, 6);
     textcolor(2);
     printf("  ----REPORT MENU----");
-    gotoxy1(20, 7);
+    gotoxy1(40, 7);
     textcolor(14);
     printf("------------------------");
-    gotoxy1(20, 9);
+    gotoxy1(40, 9);
     textcolor(14);
     printf("1. Display Remaining Stock\n");
-    gotoxy1(20, 11);
+    gotoxy1(40, 11);
     printf("2. Weekly Sales Report\n");
-    gotoxy1(20, 13);
+    gotoxy1(40, 13);
     printf("3. Best-Selling Medicine\n");
-    gotoxy1(20, 15);
-    printf("4. Graph: Weekly Sales\n");
-    gotoxy1(20, 17);
-    printf("5. Graph: Stock of Medicines\n");
-    gotoxy1(20, 19);
-    printf("6. Exit\n");
-    gotoxy1(20, 21);
-    printf("\t Select an option: ");
+    gotoxy1(40, 15);
+    printf("4. Exit\n");
+    gotoxy1(40, 18);
+    textcolor(5);
+    printf("\t\t\t\t Select an option: ");
 }
 
 // Fonction pour afficher les graphiques avec GNUPLOT
@@ -251,9 +350,10 @@ void afficherGraphiqueVentesHebdomadaires(vente_list *head) {
         exit(EXIT_FAILURE);
     }
 
-    // Inclure toutes les semaines, même celles sans ventes
     for (int i = 0; i < 52; i++) {
-        fprintf(dataFile, "%d %d\n", i + 1, ventes_par_semaine[i]);
+        if (ventes_par_semaine[i] > 0) {
+            fprintf(dataFile, "%d %d\n", i + 1, ventes_par_semaine[i]);
+        }
     }
     fclose(dataFile);
 
@@ -263,140 +363,19 @@ void afficherGraphiqueVentesHebdomadaires(vente_list *head) {
         exit(EXIT_FAILURE);
     }
 
-    fprintf(gnuplotPipe, "set title 'Weekly Sales Graph'\n");
+    fprintf(gnuplotPipe, "set title 'Weekly Sales'\n");
     fprintf(gnuplotPipe, "set xlabel 'Weeks'\n");
     fprintf(gnuplotPipe, "set ylabel 'Quantity Sold'\n");
     fprintf(gnuplotPipe, "set grid\n");
     fprintf(gnuplotPipe, "set style data linespoints\n");
-    fprintf(gnuplotPipe, "plot 'ventes_hebdo.dat' using 1:2 with linespoints title 'Weekly Sales'\n");
+    fprintf(gnuplotPipe, "plot 'ventes_hebdo.dat' using 1:2 with linespoints title 'Sales'\n");
 
     pclose(gnuplotPipe);
     remove("ventes_hebdo.dat");
 }
 
-void afficher_page(medical *med_array, int page, int total_meds) {
-    system("cls");
-    box();
-    textcolor(2);
-    gotoxy(20, 9);
-    printf("----- Best-Selling Medicines -----\n");
-
-    int start = page * MAX_MEDICAMENTS_PAR_PAGE;
-    int end = start + MAX_MEDICAMENTS_PAR_PAGE;
-    if (end > total_meds) end = total_meds;
-
-    int row = 11;
-    for (int i = start; i < end; i++) {
-        gotoxy(20, row++);
-        textcolor(15);
-        printf("%d. %-15s | Sold: %-5d | Profit: %.2f\n", i + 1, med_array[i].medi_name, med_array[i].quantity_sold, med_array[i].profit);
-    }
-
-    // Si la page suivante existe, demander à l'utilisateur de passer à la page suivante
-    if (end < total_meds) {
-        gotoxy(20, row++);
-        printf("Press 'n' for next page...\n");
-    }
-}
-
-// Fonction pour afficher un graphique avec GNUPLOT
-void plot_graph(medical *med_array, int count) {
-    // Créer un fichier temporaire pour GNUPLOT
-    FILE *temp_file = fopen("medicines_data.txt", "w");
-    if (temp_file == NULL) {
-        printf("Erreur d'ouverture du fichier temporaire.\n");
-        return;
-    }
-
-    // Écrire les données des médicaments dans le fichier
-    for (int i = 0; i < count; i++) {
-        fprintf(temp_file, "%d %d\n", i + 1, med_array[i].quantity_sold);
-    }
-    fclose(temp_file);
-
-    // Créer une commande pour GNUPLOT
-    FILE *gnupipe = popen("gnuplot -persistent", "w");
-    if (gnupipe == NULL) {
-        printf("Erreur d'ouverture du pipe GNUPLOT.\n");
-        return;
-    }
-
-    // Envoyer les commandes GNUPLOT pour créer le graphique
-    fprintf(gnupipe, "set title 'Top-Selling Medicines'\n");
-    fprintf(gnupipe, "set xlabel 'Medicine'\n");
-    fprintf(gnupipe, "set ylabel 'Quantity Sold'\n");
-    fprintf(gnupipe, "set xtics rotate by -45\n");
-    fprintf(gnupipe, "plot 'medicines_data.txt' using 1:2 with boxes title 'Quantity Sold'\n");
-    fclose(gnupipe);
-
-    // Supprimer le fichier temporaire
-    remove("medicines_data.txt");
-}
-
-// Fonction pour afficher les médicaments les plus vendus
-void medicamentLePlusVendu(med_list *head) {
-    int count = 0;
-    med_list *temp = head;
-    while (temp != NULL) {
-        count++;
-        temp = temp->next;
-    }
-
-    if (count == 0) {
-        gotoxy(20, 10);
-        printf("No medicines available.\n");
-        return;
-    }
-
-    // Tableau de médicaments trié
-    medical *med_array = (medical *)malloc(count * sizeof(medical));
-    if (!med_array) {
-        printf("Erreur d'allocation mémoire.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    temp = head;
-    for (int i = 0; i < count; i++) {
-        med_array[i] = temp->data;
-        temp = temp->next;
-    }
-
-    // Trier les médicaments par quantité vendue
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
-            if (med_array[j].quantity_sold < med_array[j + 1].quantity_sold) {
-                medical temp_med = med_array[j];
-                med_array[j] = med_array[j + 1];
-                med_array[j + 1] = temp_med;
-            }
-        }
-    }
-
-    // Affichage des médicaments par page
-    int total_pages = (count + MAX_MEDICAMENTS_PAR_PAGE - 1) / MAX_MEDICAMENTS_PAR_PAGE;
-    int page = 0;
-    char choice;
-
-    do {
-        afficher_page(med_array, page, count);
-
-        // Afficher le graphique
-        plot_graph(med_array, count);
-
-        // Gérer la navigation entre les pages
-        if (page < total_pages - 1) {
-            choice = getchar();
-            if (choice == 'n' || choice == 'N') {
-                page++;
-            }
-        }
-
-    } while (choice == 'n' || choice == 'N');
-
-    free(med_array);
-}
-void afficherGraphiqueStock(med_list *head) {
-    med_list* temp = head;
+void afficherGraphiqueStock(med_list1 *head) {
+    med_list1* temp = head;
 
     FILE *dataFile = fopen("stock_medicaments.dat", "w");
     if (!dataFile) {
@@ -431,32 +410,25 @@ void afficherGraphiqueStock(med_list *head) {
 
 // Fonction principale pour gérer le menu des rapports
 void report_menu() {
-    med_list *head = NULL;
+    med_list1 *head = NULL;
     vente_list *ventes_head = NULL;
 
     // Ajout de médicaments exemples
-    medical med1 = {"001", "Paracetamol", 100, 101, 0, 0.50, 0.0, 0.30, 0.50, "2024-12-31", "Supplier A"};
-    medical med2 = {"002", "Ibuprofen", 50, 102, 0, 1.00, 0.0, 0.60, 1.00, "2025-01-31", "Supplier B"};
+    medical2 med1 = {"001", "Paracetamol", 100, 101, 0, 0.50, 0.0, 0.30, 0.50, "2024-12-31", "Supplier A"};
+    medical2 med2 = {"002", "Ibuprofen", 50, 102, 0, 1.00, 0.0, 0.60, 1.00, "2025-01-31", "Supplier B"};
     head = ajouterMedicament(head, med1);
     head = ajouterMedicament(head, med2);
+      // Ajout de médicaments exemples supplémentaires
+    medical2 med3 = {"003", "Aspirin", 200, 103, 0, 0.80, 0.0, 0.50, 0.80, "2024-12-31", "Supplier C"};
+    medical2 med4 = {"004", "Cough Syrup", 150, 104, 0, 2.00, 0.0, 1.50, 2.00, "2025-01-31", "Supplier D"};
+    medical2 med5 = {"005", "Vitamin C", 300, 105, 0, 0.60, 0.0, 0.40, 0.60, "2025-02-28", "Supplier E"};
 
-    // Enregistrement des ventes exemples
-    enregistrerVente(head, &ventes_head, "001", 5, "2024-12-01");
-    enregistrerVente(head, &ventes_head, "002", 3, "2024-12-02");
-    enregistrerVente(head, &ventes_head, "001", 2, "2024-12-02");
-    // Ajout de médicaments exemples supplémentaires
-medical med3 = {"003", "Aspirin", 200, 103, 0, 0.80, 0.0, 0.50, 0.80, "2024-12-31", "Supplier C"};
-medical med4 = {"004", "Cough Syrup", 150, 104, 0, 2.00, 0.0, 1.50, 2.00, "2025-01-31", "Supplier D"};
-medical med5 = {"005", "Vitamin C", 300, 105, 0, 0.60, 0.0, 0.40, 0.60, "2025-02-28", "Supplier E"};
-
-head = ajouterMedicament(head, med3);
-head = ajouterMedicament(head, med4);
-head = ajouterMedicament(head, med5);
-
-// Enregistrement de ventes supplémentaires pour ces nouveaux médicaments
-enregistrerVente(head, &ventes_head, "003", 10, "2024-12-05");
-enregistrerVente(head, &ventes_head, "004", 5, "2024-12-06");
-enregistrerVente(head, &ventes_head, "005", 20, "2024-12-07");
+    head = ajouterMedicament(head, med3);
+    head = ajouterMedicament(head, med4);
+    head = ajouterMedicament(head, med5);
+    enregistrerVente(head, &ventes_head, "003", 10, "2024-12-05");
+    enregistrerVente(head, &ventes_head, "004", 5, "2024-12-06");
+    enregistrerVente(head, &ventes_head, "005", 20, "2024-12-07");
 
     int choix;
     do {
@@ -468,31 +440,33 @@ enregistrerVente(head, &ventes_head, "005", 20, "2024-12-07");
         switch (choix) {
             case 1:
                 afficherStock(head);
+                 afficherGraphiqueStock(head);
                 break;
             case 2:
                 rapportVentesHebdomadaires(ventes_head);
+                 afficherGraphiqueVentesHebdomadaires(ventes_head);
                 break;
             case 3:
                 medicamentLePlusVendu(head);
                 break;
             case 4:
-                afficherGraphiqueVentesHebdomadaires(ventes_head);
-                break;
-            case 5:
-                afficherGraphiqueStock(head);
-                break;
-            case 6:
+               box();
+               gotoxy(30,12);
+               textcolor(2);
                 printf("Exiting...\n");
+                main_menu();
                 break;
             default:
+                box();
+                gotoxy(30,12);
+                textcolor(1);
                 printf("Invalid option. Try again.\n");
         }
 
-        if (choix != 6) {
-            printf("\n\n\n\n\n\n\tPress any key to return to the menu...\n");
+        if (choix != 4) {
+            printf("\n\n\n\tPress any key to return to the menu...\n");
             getch();
         }
     } while (choix != 6);
 }
-
 #endif

@@ -1,0 +1,48 @@
+Dr. Dupont
+Cardiologue
+123 Avenue des Champs
++33123456789
+SignatureDupont
+123456789RPPS
+2024-06-01
+30 jours
+ABC123456
+Dr. Jean Dupont
+Cardiologist
+123 Rue de Paris, 75001 Paris
+01 23 45 67 89
+Dr. J. Dupont
+123456789
+01/01/2026
+30
+CODE123456
+
+Dr. Jean Dupont
+Cardiologist
+123 Rue de Paris, 75001 Paris
+01 23 45 67 89
+Dr. J. Dupont
+123456789
+01/01/2025
+30
+CODE123457
+
+Dr. Alice Dupont
+Cardiologist
+123 Health Street, Paris
+01-23-45-67-89
+Dr. Alice Dupont
+1234567890
+15/05/2024
+31/12/2026
+1234567890123
+
+Dr. Pierre Martin
+Neurologist
+456 Medical Blvd, Lyon
+01-98-76-54-32
+Dr. Pierre Martin
+0987654321
+10/06/2024
+31/12/2026
+9876543210987

@@ -14,18 +14,19 @@
 
 void afficherInfoMedicament(medical *med) {
     textcolor(14);
-    gotoxy(20, 7);
+    gotoxy(30, 7);
     printf("   Information about the medicine:");
     textcolor(15);
-    gotoxy(20, 10);
+    gotoxy(30, 10);
     // Displaying medication information
     printf("ID: %s", med->id);
-    gotoxy(20, 11);
+    gotoxy(30, 11);
     printf("Name: %s\n", med->medi_name);
-    gotoxy(20, 12);
+    gotoxy(30, 12);
     printf("Price: %.2f\n", med->cost);
-    gotoxy(20, 13);
+    gotoxy(30, 13);
     printf("Expiration Date: %s\n", med->exp_date);
+    system("pause");
 }
 
 

@@ -16,37 +16,37 @@
 #include"menu_client.h"
 void commande(const char *filename, const char *critere);
 void add_to_cart(medical *mede);
+void  menu_client();
 void search_medicine() {
     char recherche[50];
     int choice;
-    medical med;
+    medical mede;
     int found = 0;
 
     // Request search type (by name or by ID)
     system("cls");
     textcolor(15);
     box();
-    gotoxy(20, 8);
-    textcolor(6);
+    gotoxy(40, 8);
+    textcolor(2);
 
     printf("Choose the type of search:\n\n");
-    gotoxy(20, 10);
+    gotoxy(40, 12);
     textcolor(15);
     printf("1. By name\n");
-    gotoxy(20, 11);
+    gotoxy(40, 11);
     printf("2. By ID\n");
-    gotoxy(10, 25);
+    gotoxy(40, 16);
     textcolor(2);
     printf("Your choice: ");
 
     scanf("%d", &choice);
-
     // Request search criterion
     if (choice == 1) {
         system("cls");
         textcolor(15);
         box();
-        gotoxy(20, 8);
+        gotoxy(40, 8);
         textcolor(6);
         printf("Enter the name of the medicine: ");
         scanf("%s", recherche);
@@ -54,7 +54,7 @@ void search_medicine() {
         system("cls");
         textcolor(15);
         box();
-        gotoxy(20, 8);
+        gotoxy(40, 8);
         textcolor(6);
         printf("Enter the ID of the medicine: ");
         scanf("%s", recherche);
@@ -62,9 +62,15 @@ void search_medicine() {
         system("cls");
         textcolor(15);
         box();
-        gotoxy(20, 8);
+        gotoxy(40, 8);
         textcolor(8);
         printf("Invalid choice. Please try again.\n");
+    /**   char ch;
+        printf("Do you want to return to the menu ?? \n\t please press enter ");
+        ch= getch();
+        if(ch='y'|| ch='Y')*/
+        sleep(2);
+        menu_client();
         return;
     }
 
@@ -74,13 +80,13 @@ void search_medicine() {
         system("cls");
         textcolor(15);
         box();
-        gotoxy(20, 8);
+        gotoxy(40, 8);
         textcolor(8);
         printf("Error: Unable to open the medications file.\n");
         sleep(8);
         return;
     }
-
+    medical med;
     // Read line by line
     char line[256];
     while (fgets(line, sizeof(line), file) != NULL) {
@@ -96,60 +102,60 @@ void search_medicine() {
                 system("cls");
                 textcolor(15);
                 box();
-                gotoxy(20, 5);
+                gotoxy(40, 5);
                 textcolor(2);
                 printf("The medicine exists.");
                 afficherInfoMedicament(&med);
-                sleep(3);
-
+                gotoxy(30,20);
+                textcolor(15);
+                system("pause");
                 // Ask for action
                 int action;
                 system("cls");
                 textcolor(15);
                 box();
-                gotoxy(20, 8);
+                gotoxy(40, 8);
                 textcolor(2);
                 printf("What do you want to do?");
-                gotoxy(20, 10);
+                gotoxy(40, 10);
                 textcolor(15);
                 printf("1. Order\n");
-                gotoxy(20, 11);
+                gotoxy(40, 11);
                 printf("2. Add to cart\n");
-                gotoxy(20, 12);
+                gotoxy(40, 12);
                 printf("3. Cancel\n");
-                gotoxy(10, 25);
-                textcolor(2);
+                gotoxy(30, 18);
+                textcolor(1);
                 printf("Your choice: ");
-                scanf("%d", &action);
+                action=toupper(getche());
 
                 switch (action) {
-                    case 1:
-
+                    case '1':
                        fclose(file);
-                        commande("medicines.txt", recherche);
-
-                        clientiinfo();
+                       commande("medicines.txt", recherche);
                         break;
-                    case 2:
+                    case '2':
                         add_to_cart(&med);
                         break;
-                    case 3:
+                    case '3':
                         system("cls");
                         textcolor(15);
                         box();
-                        gotoxy(20, 8);
+                        gotoxy(40, 8);
                         textcolor(15);
                         printf("Action cancelled.\n");
+                        sleep(3);
+                        menu_client();
                         break;
                     default:
                         system("cls");
                         textcolor(15);
                         box();
-                        gotoxy(20, 8);
+                        gotoxy(40, 8);
                         textcolor(8);
                         printf("Invalid choice.\n");
+                        menu_client();
                 }
-                break;
             }
         }
     }
@@ -159,10 +165,11 @@ void search_medicine() {
         system("cls");
         textcolor(15);
         box();
-        gotoxy(20, 8);
+        gotoxy(40, 8);
         textcolor(15);
         printf("Medicine not found.\n");
-        sleep(8);
+        sleep(5);
+        menu_client();
     }
 
     fclose(file);

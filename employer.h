@@ -11,8 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <windows.h>
-
-// === Déclaration des structures ===
+#include"menu_adm.h"
 typedef struct Employe {
     int employeID;
     char nom[50];
@@ -21,11 +20,18 @@ typedef struct Employe {
     float salaire;
     struct Employe *next;
 } Employe;
-
+void notification_menu();
 typedef struct str {
     Employe data;
     struct str *suivant;
 } *liste;
+void main_menu();
+void gotoxy1(int x, int y) ;
+ void gotoxy(int x,int y);
+void textcolor(int color) ;
+ void menu_employer();
+void box();
+// === Déclaration des structures ===
 
 // === Fonctions principales ===
 void insererfin(liste *l, Employe e1) {
@@ -76,7 +82,7 @@ void afficher_tous_les_employes(liste l) {
     system("cls");
     box();
 
-    gotoxy1(10, 3);
+    gotoxy1(40, 5);
     textcolor(11); // Cyan pour le titre
     printf("=== Liste de tous les employés ===");
     textcolor(7);
@@ -87,13 +93,13 @@ void afficher_tous_les_employes(liste l) {
     int line = 5;
 
     while (fscanf(p, "%d %[^\n] %[^\n] %[^\n] %f", &employeID, nom, role, contact, &salaire) == 5) {
-        gotoxy1(5, line++);
+        gotoxy1(20, line++);
         printf("ID: %d | Nom: %s | Role: %s | Salaire: %.2f", employeID, nom, role, salaire);
     }
 
     fclose(p);
-    gotoxy1(5, line + 2);
-    printf("\n\n\n\n\tFin de la liste.");
+    gotoxy1(20, line + 2);
+    printf("\n\n\n\n\n\n\n\t\tFin de la liste.");
     system("pause");
 }
 
@@ -142,7 +148,7 @@ void supprimer_employe(liste *l, int employeID) {
 
     fclose(p);
 }
-
+/*
 void menu_employer(liste *l) {
     int choix, id_suppression;
     Employe e1;
@@ -150,39 +156,41 @@ void menu_employer(liste *l) {
     do {
         system("cls");
         box();
-        gotoxy1(25, 8);
+        gotoxy1(40, 8);
         textcolor(2); 
         printf("--- MENU GESTION DES EMPLOYÉS ---");
         textcolor(15);
 
-        gotoxy1(20, 10); printf("1. Add employer");
-        gotoxy1(20, 12); printf("2. Display employers");
-        gotoxy1(20, 14); printf("3.Delete employer");
-        gotoxy1(20, 16); printf("4. Exit");
+        gotoxy1(40, 10); printf("1. Add employer");
+        gotoxy1(40, 12); printf("2. Display employers");
+        gotoxy1(40, 14); printf("3.Delete employer");
+        gotoxy1(40, 16); printf("4. Exit");
 
-        gotoxy1(20, 25);
-        printf("Entre your choice : ");
+        gotoxy1(20, 18);
+        textcolor(1);
+        printf("\tEntre your choice : ");
         scanf("%d", &choix);
 
         switch (choix) {
             case 1:
                 system("cls");
                 box();
-                gotoxy1(10, 3);
+                gotoxy1(40, 3);
                 printf("=== Add a  new  employer ===");
-                gotoxy1(10, 5);
+                gotoxy1(30, 5);
                 printf("ID : "); scanf("%d", &e1.employeID);
-                gotoxy1(10, 6);
+                gotoxy1(30, 6);
                 printf("Nom : "); scanf(" %[^\n]", e1.nom);
-                gotoxy1(10, 7);
+                gotoxy1(30, 7);
                 printf("Role : "); scanf(" %[^\n]", e1.role);
-                gotoxy1(10, 8);
+                gotoxy1(30, 8);
                 printf("Contact : "); scanf("%s", e1.contact);
-                gotoxy1(10, 9);
+                gotoxy1(30, 9);
                 printf("Salaire : "); scanf("%f", &e1.salaire);
-
+           
                 insererfin(l, e1);
                 system("pause");
+                sleep(1000);
                 break;
 
             case 2:system("cls");
@@ -193,9 +201,9 @@ void menu_employer(liste *l) {
             case 3:
                 system("cls");
                 box();
-                gotoxy1(10, 3);
+                gotoxy1(40, 3);
                 printf("=== Delete  a employer ===");
-                gotoxy1(10, 5);
+                gotoxy1(20, 5);
                 printf("Entre ID a delete of  employer: ");
                 scanf("%d", &id_suppression);
                 supprimer_employe(l, id_suppression);
@@ -204,6 +212,7 @@ void menu_employer(liste *l) {
 
             case 4:
                 printf("Thank you for your visite  !");
+                main_menu();
                 break;
 
             default:
@@ -214,6 +223,102 @@ void menu_employer(liste *l) {
         }
     } while (choix != 4);
 }
+*/
+liste employes = NULL;
+void menu_employer() {
+    int choix, id_suppression;
+    Employe e1;
 
+    do {
+        system("cls");
+        box();
+        gotoxy(30,8);
+        printf("=== MENU GESTION DES EMPLOYÉS ===\n");
+          gotoxy(40,10);
+                textcolor(15);
+        printf("1. Add employer\n");
+          gotoxy(40,12);
+                textcolor(15);
+        printf("2. Display employers\n");
+          gotoxy(40,14);
+                textcolor(15);
+        printf("3. Delete employer\n");
+          gotoxy(40,16);
+                textcolor(15);
+        printf("4. Exit\n");
+  gotoxy(40,18);
+                textcolor(5);
+        printf("Enter your choice: ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1:
+                system("cls");
+                box();
+                gotoxy(30,8);
+                textcolor(2);
+                printf("=== Add a new employer ===\n");
+                gotoxy(40,10);
+                textcolor(15);
+                printf("ID: "); scanf("%d", &e1.employeID);
+                gotoxy(40,12);
+                textcolor(15);
+                printf("Name: "); scanf(" %[^\n]", e1.nom);
+                gotoxy(40,14);
+                textcolor(15);
+                printf("Role: "); scanf(" %[^\n]", e1.role);
+                gotoxy(40,16);
+                textcolor(15);
+                printf("Contact: "); scanf("%s", e1.contact);
+                gotoxy(40,18);
+                textcolor(15);
+                printf("Salary: "); scanf("%f", &e1.salaire);
+
+                insererfin(&employes, e1);
+                printf("Employee added successfully!\n");
+                system("pause");
+                break;
+
+            case 2:
+                system("cls");
+             box();
+             gotoxy(30,12);
+             textcolor(2);
+                afficher_tous_les_employes(employes);
+                system("pause");
+                break;
+
+            case 3:
+            system("cls");
+             box();
+             gotoxy(30,8);
+             textcolor(2);
+                printf("=== Delete an employer ===\n");
+                gotoxy(40,10);
+                textcolor(7);
+                printf("Enter the ID of the employer to delete: ");
+                scanf("%d", &id_suppression);
+                supprimer_employe(&employes, id_suppression);
+                system("pause");
+                break;
+
+            case 4:
+            system("cls");
+             box();
+             gotoxy(30,12);
+             textcolor(2);
+                printf("Thank you for your visit!\n");
+                break;
+
+            default:
+            system("cls");
+             box();
+             gotoxy(30,12);
+             textcolor(4);
+                printf("Invalid choice, try again!\n");
+                system("pause");
+        }
+    } while (choix != 4);
+}
 
 #endif

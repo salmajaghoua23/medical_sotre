@@ -1,0 +1,2 @@
+C001;2024-12-14;Paracetamol x2, Ibuprofen x1;20.50
+C002;2024-12-15;Amoxicillin x1;15.00

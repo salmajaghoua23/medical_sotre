@@ -1,0 +1,4 @@
+001 SALMA JAGHOOUA 0689829787 SALMA@GMAIL.COM 2004 2023
+002 ali alla 0678985432 ali@gmail.com 1234 2004
+003 walid lbhir 0678967543 walid@gmail.com 12345 
+004 khadija alla 0678564312 khadija@gmail.com 2005 1234

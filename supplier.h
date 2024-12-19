@@ -1,18 +1,21 @@
 #ifndef SUPPLIER_H_INCLUDED
 #define SUPPLIER_H_INCLUDED
 
+#include "menu_adm.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <windows.h>
-#include"interface.h"
-// Defining the structures
+#include <conio.h>
+#include "interface.h"
+
+// Définition de la structure Supplier
 struct supplier {
     int supp_id;
     char supp_name[25];
     char city[20];
-    char mob_no[11];
+    char mob_no[11];  // Le numéro de téléphone doit contenir 10 chiffres
     char email[30];
 };
 typedef struct supplier Supplier;
@@ -22,237 +25,306 @@ typedef struct str1 {
     struct str1 *next;
 } *list1;
 
-// Function prototypes
+// Prototypes des fonctions
 void insert_at_end_supplier(list1 *l, Supplier temp1);
 void delete_supplier(list1 *l, int supp_id);
-void display_suppliers(list1 l);
+void display_suppliers();
 void load_suppliers(list1 *l);
 void supplier_menu();
-void gotoxy2(int x, int y);  // Change the name here
+void gotoxy3(int x, int y);
 void box();
 
-// Function to insert a supplier at the end of the list
+// Fonction pour vérifier si un numéro de téléphone est valide
+int validate_phone_number(char *mob_no) {
+    if (strlen(mob_no) != 10) return 0;  // Le numéro doit avoir 10 chiffres
+    for (int i = 0; i < 10; i++) {
+        if (!isdigit(mob_no[i])) return 0;  // Le numéro doit être composé de chiffres uniquement
+    }
+    return 1;  // Numéro valide
+}
+
+// Fonction pour vérifier si un email est valide
+int validate_email(char *email) {
+    // Vérifier la présence de "@" et "."
+    char *at_sign = strchr(email, '@');
+    char *dot_sign = strchr(email, '.');
+    
+    if (at_sign && dot_sign && at_sign < dot_sign) {
+        return 1;  // Email valide
+    }
+    return 0;  // Email invalide
+}
+
+// Fonction pour vérifier si un ID fournisseur existe déjà dans le fichier
+int check_supplier_id(int supp_id) {
+    FILE *file = fopen("supplier.txt", "r");
+    if (file == NULL) {
+        printf("File 'supplier.txt' not found . .\n");
+        return 0;  // Si le fichier n'existe pas, considérer l'ID comme valide
+    }
+
+    Supplier sep;
+    while (fscanf(file, "%d %24s %19s %10s %29s", &sep.supp_id, sep.supp_name, sep.city, sep.mob_no, sep.email) == 5) {
+        if (sep.supp_id == supp_id) {
+            fclose(file);
+            return 1;  // ID existe déjà
+        }
+    }
+
+    fclose(file);
+    return 0;  // ID valide, n'existe pas
+}
+
+// Fonction pour insérer un fournisseur dans le fichier
 void insert_at_end_supplier(list1 *l, Supplier temp1) {
+    if (check_supplier_id(temp1.supp_id)) {
+        printf("Supplier with ID %d already exists.\n", temp1.supp_id);
+        return;
+    }
+
+    if (!validate_phone_number(temp1.mob_no)) {
+        printf("Invalid phone number. It must be 10 digits.\n");
+        return;
+    }
+
+    if (!validate_email(temp1.email)) {
+        printf("Invalid email format. It must contain '@' and '.'\n");
+        return;
+    }
+
     FILE *p = fopen("supplier.txt", "a+");
     if (p == NULL) {
         printf("Error opening file\n");
         return;
     }
 
-    list1 b = (list1)malloc(sizeof(struct str1));
-    if (b == NULL) {
-        printf("Memory allocation failed\n");
-        return;
-    }
-
-    b->data = temp1;
-    b->next = NULL;
-
-    if (*l == NULL) {
-        *l = b;
-    } else {
-        list1 tp = *l;
-        while (tp->next != NULL) {
-            tp = tp->next;
-        }
-        tp->next = b;
-    }
-
     fprintf(p, "%d %s %s %s %s\n", temp1.supp_id, temp1.supp_name, temp1.city, temp1.mob_no, temp1.email);
     fclose(p);
+    printf("Supplier added successfully!\n");
 }
 
-// Function to delete a supplier
-void delete_supplier(list1 *l, int supp_id) {
-    if (*l == NULL) {
-        printf("The list is empty!\n");
+// Fonction pour afficher les fournisseurs
+// Fonction pour afficher les fournisseurs avec bordure et couleurs ajustées
+void display_suppliers() {
+    FILE *file = fopen("supplier.txt", "r");
+    if (file == NULL) {
+        printf("File 'supplier.txt' not found . .\n");
+        getchar(); // Pause pour Windows/Linux
         return;
     }
+    system("cls");
 
-    FILE *p = fopen("supplier.txt", "w");
-    if (p == NULL) {
+    // Positionner l'affichage à gotoxy(20, 10)
+    gotoxy3(20, 10);
+
+    // Bordure colorée
+    textcolor(14);  // Couleur bordure (jaune)
+    printf("╔═════════════════════════════════════════════════════════════════════════╗\n");
+
+    // Titre du système
+    gotoxy(20, 12);
+    textcolor(7);   // Couleur texte (blanc)
+    printf("║                           PHARMACY SYSTEM                               ║\n");
+
+    // Bordure du bas du titre
+    gotoxy(20, 14);
+    textcolor(14);  // Couleur bordure (jaune)
+    printf("╚═════════════════════════════════════════════════════════════════════════╝\n");
+
+    // Affichage des entêtes avec couleur
+    gotoxy(20, 16);
+    textcolor(11);  // Couleur de l'entête (cyan)
+    printf("╔═══════╦══════════════════════╦══════════╦══════════╦════════════════════╗\n");
+
+    gotoxy(20, 18);
+    textcolor(11);  // Couleur de l'entête (cyan)
+    printf("║  ID   ║    Supplier Name     ║  City    ║  Phone   ║  Email             ║\n");
+
+    gotoxy(20, 20);
+    textcolor(11);  // Couleur de l'entête (cyan)
+    printf("╠═══════╬══════════════════════╬══════════╬══════════╬════════════════════╣\n");
+
+    // Affichage des données des fournisseurs
+    Supplier sep;
+    int row = 0;
+    int line_num = 22;  // La ligne où commence l'affichage des données (après l'entête)
+
+    while (fscanf(file, "%d %24s %19s %10s %29s", &sep.supp_id, sep.supp_name, sep.city, sep.mob_no, sep.email) == 5) {
+        textcolor(7);  // Couleur du texte (blanc)
+        gotoxy(20, line_num);  // Positionner chaque ligne de données
+        printf("║ %-5d ║ %-20s ║ %-8s ║ %-8s ║ %-18s ║\n",
+               sep.supp_id, sep.supp_name, sep.city, sep.mob_no, sep.email);
+
+        row++;
+        line_num++;  // Passer à la ligne suivante pour chaque fournisseur
+
+        if (row % 5 == 0) {
+            // Après chaque 5 lignes, ajouter une ligne de séparation
+            textcolor(14);  // Couleur de bordure (jaune)
+            gotoxy(20, line_num);
+            printf("╟───────┼──────────────────────┼──────────┼──────────┼───────────────╢\n");
+            line_num++;  // Passer à la ligne suivante après la séparation
+        }
+    }
+
+    // Bordure en bas
+    textcolor(14);  // Couleur bordure (jaune)
+    gotoxy(20, line_num);  // Placer la bordure en bas à la dernière ligne
+    printf("╚═══════╩══════════════════════╩══════════╩══════════╩════════════════════╝\n");
+
+    fclose(file);
+
+    // Demander à l'utilisateur s'il veut revenir au menu
+    printf("\nPress any key to return to the menu...");
+    char c = getch();
+    if (c == 'y' || c == 'Y') {
+        supplier_menu();
+    }
+}
+
+
+// Fonction pour supprimer un fournisseur
+void delete_supplier(list1 *l, int supp_id) {
+    FILE *file = fopen("supplier.txt", "r");
+    FILE *temp = fopen("temp.txt", "w");
+
+    if (file == NULL || temp == NULL) {
         printf("Error opening file\n");
         return;
     }
 
-    list1 current = *l;
-    list1 prev = NULL;
+    Supplier sep;
     int found = 0;
 
-    while (current != NULL) {
-        if (current->data.supp_id == supp_id) {
+    while (fscanf(file, "%d %24s %19s %10s %29s", &sep.supp_id, sep.supp_name, sep.city, sep.mob_no, sep.email) == 5) {
+        if (sep.supp_id == supp_id) {
             found = 1;
-            if (prev == NULL) {
-                *l = current->next;
-            } else {
-                prev->next = current->next;
-            }
-            free(current);
-            printf("Supplier with ID %d deleted successfully!\n", supp_id);
-            break;
+            continue; // Ne pas écrire le fournisseur à supprimer
         }
-        prev = current;
-        current = current->next;
+        fprintf(temp, "%d %s %s %s %s\n", sep.supp_id, sep.supp_name, sep.city, sep.mob_no, sep.email);
     }
 
-    if (!found) {
+    fclose(file);
+    fclose(temp);
+
+    remove("supplier.txt");
+    rename("temp.txt", "supplier.txt");
+
+    if (found)
+        printf("Supplier with ID %d deleted successfully!\n", supp_id);
+    else
         printf("Supplier with ID %d not found!\n", supp_id);
-    }
 
-    list1 temp = *l;
-    while (temp != NULL) {
-        fprintf(p, "%d %s %s %s %s\n", temp->data.supp_id, temp->data.supp_name, temp->data.city, temp->data.mob_no, temp->data.email);
-        temp = temp->next;
-    }
-
-    fclose(p);
+    printf("Press any key to continue...");
+    getch();
 }
 
-// Fonction pour afficher les fournisseurs
-void display_suppliers(list1 l) {
-    int x = 5, y = 3;  // Position de départ du texte à l'intérieur de la boîte
-
-    // Appel de la fonction box pour dessiner l'encadré
-    box();
-
-    // Affichage du titre et de l'en-tête à l'intérieur du cadre
-    gotoxy(x, y);
-    printf("List of Suppliers");
-    gotoxy(x, y + 1);
-    printf("ID\tName\tCity\tPhone\tEmail");
-    
-    // Déplacer la ligne d'affichage des fournisseurs
-    y = 5;  // Nouvelle position après l'en-tête
-
-    // Parcours de la liste des fournisseurs et affichage des données
-    while (l != NULL) {
-        gotoxy(x, y);
-        printf("%d\t%s\t%s\t%s\t%s", 
-               l->data.supp_id, 
-               l->data.supp_name, 
-               l->data.city, 
-               l->data.mob_no, 
-               l->data.email);
-        y++;
-        l = l->next;
-    }
-}
-
-// Function to load suppliers from a file
-void load_suppliers(list1 *l) {
-    FILE *p = fopen("supplier.txt", "r");
-    if (p == NULL) {
-        printf("Unable to open the suppliers file.\n");
-        return;
-    }
-
+// Fonction pour le menu des fournisseurs
+void supplier_menu() {
+    char ch;
     Supplier temp1;
-    while (fscanf(p, "%d %s %s %s %s",
-                  &temp1.supp_id,
-                  temp1.supp_name,
-                  temp1.city,
-                  temp1.mob_no,
-                  temp1.email) != EOF) {
-        insert_at_end_supplier(l, temp1);
-    }
-    fclose(p);
-    printf("Suppliers loaded from the file successfully!\n");
+
+    do {
+        system("cls");
+        box();
+        gotoxy3(40, 4);
+        textcolor(2);
+        printf("---- Supplier MENU ----");
+        textcolor(7);
+        gotoxy3(40, 6);
+        printf("1- Add New Supplier");
+        gotoxy3(40, 8);
+        printf("2- Display All Suppliers");
+        gotoxy3(40, 10);
+        printf("3- Delete Supplier");
+        gotoxy3(40, 12);
+        printf("4- Quit");
+        textcolor(1);
+        gotoxy3(40, 14);
+        printf("Enter your choice: ");
+        ch = toupper(getche());
+       
+        switch (ch) {
+            case '1':
+                box();
+                gotoxy(30,5);
+                system("cls");
+                textcolor(7);
+                gotoxy(30,8);
+                printf("Enter Supplier ID: ");
+                scanf("%d", &temp1.supp_id);
+
+                // Vérifier si l'ID existe déjà
+                if (check_supplier_id(temp1.supp_id)) {
+                    printf("Supplier with ID %d already exists.\n", temp1.supp_id);
+                    break;
+                }
+                gotoxy(30,10);
+                printf("Enter Supplier Name: ");
+                scanf("%s", temp1.supp_name);
+                gotoxy(30,12);
+                printf("Enter City: ");
+                gotoxy(30,14);
+                scanf("%s", temp1.city);
+                printf("Enter Phone: ");
+                gotoxy(30,16);
+                scanf("%s", temp1.mob_no);
+
+                // Valider le téléphone
+                if (!validate_phone_number(temp1.mob_no)) {
+                    printf("Invalid phone number. It must be 10 digits.\n");
+                    break;
+                }
+                gotoxy(30,18);
+                printf("Enter Email: ");
+                scanf("%s", temp1.email);
+
+                // Valider l'email
+                if (!validate_email(temp1.email)) {
+                    printf("Invalid email format. It must contain '@' and '.'\n");
+                    break;
+                }
+
+                insert_at_end_supplier(NULL, temp1); // Pas besoin de la liste ici
+                break;
+
+            case '2':
+                display_suppliers();
+                system("pause");
+                break;
+
+            case '3': {
+                int id;
+                system("cls");
+                printf("Enter Supplier ID to delete: ");
+                scanf("%d", &id);
+                delete_supplier(NULL, id); // Pas besoin de la liste ici
+                break;
+            }
+
+            case '4':
+            box();
+            gotoxy(30,10);
+            textcolor(2);
+            printf("\nExiting Supplier Menu...\n");
+            main_menu();
+                return;
+
+            default:
+                box();
+                 gotoxy(30,10);
+                 textcolor(14);
+                printf("\nInvalid option! Try again.\n");
+        }
+    } while (ch != '4');
 }
 
-// Function to move cursor to specific coordinates (renamed gotoxy2)
+// Fonction pour positionner le curseur (gotoxy3)
 void gotoxy3(int x, int y) {
     COORD coord;
     coord.X = x;
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
-// Function to draw a simple box around the menu
-// Main menu function
-void supplier_menu() {
-    list1 l = NULL;
-    char ch;
-
-    // Load suppliers from file
-    load_suppliers(&l);
-
-    do {
-        system("cls");
-        gotoxy3(34, 3);
-        textcolor(2);
-        gotoxy3(35, 4);
-        printf("----Supplier MENU----");
-        gotoxy3(34, 5);
-        textcolor(14);
-        box(); // Draw the box
-        gotoxy3(26, 8);
-        printf("1- Add New Supplier");
-        gotoxy3(26, 10);
-        printf("2- Display All Suppliers");
-        gotoxy3(26, 12);
-        printf("3- Delete Supplier");
-        gotoxy3(26, 14);
-        printf("4- Quit");
-
-        gotoxy3(26, 18);
-        printf("\n\n\t Press a key for operation...\t");
-
-        ch = toupper(getche()); // Get user input
-
-        switch (ch) {
-            case '1': {
-                Supplier temp1;
-                system("cls");
-                box();
-                gotoxy3(10, 3);
-                printf("=== Add a New Supplier ===");
-                gotoxy3(10, 5);
-                printf("ID: ");
-                scanf("%d", &temp1.supp_id);
-                gotoxy3(10, 7);
-                printf("Name: ");
-                scanf("%s", temp1.supp_name);
-                gotoxy3(10, 9);
-                printf("City: ");
-                scanf("%s", temp1.city);
-                gotoxy3(10, 11);
-                printf("Phone: ");
-                scanf("%s", temp1.mob_no);
-                gotoxy3(10, 13);
-                printf("Email: ");
-                scanf("%s", temp1.email);
-
-                insert_at_end_supplier(&l, temp1);
-                system("pause");
-                break;
-            }
-            case '2':
-                system("cls");
-                box();
-                display_suppliers(l);
-                system("pause");
-                break;
-            case '3': {
-                int id_deletion;
-                system("cls");
-                box();
-                gotoxy3(10, 3);
-                printf("=== Delete a Supplier ===");
-                gotoxy3(10, 5);
-                printf("Enter Supplier ID to delete: ");
-                scanf("%d", &id_deletion);
-                delete_supplier(&l, id_deletion);
-                system("pause");
-                break;
-            }
-            case '4':
-                printf("\nExiting Supplier Menu...\n");
-                break;
-            default:
-                printf("\nPlease enter a valid option.\n");
-                system("pause");
-        }
-    } while (ch != '4');
 }
 
 #endif
